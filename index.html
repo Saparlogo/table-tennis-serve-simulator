@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Serve Simulator PRO v3.0</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
+    
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background-color: #0b0e14; color: #f1f5f9; overflow: hidden; margin: 0; padding: 0; }
+    
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.2); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.4); }
+
+    /* ── Sliders ── */
+    .slider-wrap { position: relative; width: 100%; display: flex; align-items: center; height: 20px; }
+    .slider-bg { position: absolute; inset: 0; background: #1a1f2e; border-radius: 999px; overflow: hidden; border: 1px solid #23283b; }
+    .slider-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: #ccff00; transition: width 0.08s ease; box-shadow: 0 0 10px rgba(204,255,0,0.2); }
+    input[type=range] { -webkit-appearance: none; width: 100%; height: 100%; opacity: 0; cursor: pointer; position: relative; z-index: 2; }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #fff; border-radius: 50%; box-shadow: 0 0 0 2px #ccff00, 0 0 12px rgba(204,255,0,0.4); }
+    .ctrl-group:has(input:active) .slider-bg,
+    .ctrl-group:has(input:focus) .slider-bg { border-color: rgba(204,255,0,0.4); box-shadow: 0 0 0 2px rgba(204,255,0,0.1); }
+
+    /* ── Buttons ── */
+    .ctrl-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #131722; transition: all 0.18s; cursor: pointer; border: 1px solid #23283b; }
+    .ctrl-btn:hover { background: #1a1f2e; border-color: #ccff00; box-shadow: 0 0 12px rgba(204,255,0,0.15); transform: scale(1.06); }
+    .val-pill { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; border: 1px solid #23283b; background: rgba(255,255,255,0.02); color: #fff; }
+    
+    .generate-btn { background: #ccff00; color: #0b0e14; transition: all 0.22s; position: relative; overflow: hidden; border: none; font-weight: 900; }
+    .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -6px rgba(204,255,0,0.4); background: #d9ff33; }
+    .generate-btn:active { transform: translateY(1px); }
+    .generate-btn:disabled { opacity: 0.45; pointer-events: none; }
+    
+    /* ── Canvas ── */
+    #mainCanvas { width: 100% !important; height: 100% !important; display: block; cursor: grab; }
+    #mainCanvas:active { cursor: grabbing; }
+    
+    /* ── Tab buttons ── */
+    .tab-btn { padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.18s; background: transparent; border: 1px solid #23283b; color: #64748b; }
+    .tab-btn.active { background: rgba(34,211,238,0.1); border-color: #22d3ee; color: #22d3ee; box-shadow: inset 0 0 12px rgba(34,211,238,0.05); }
+    .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.03); color: #e2e8f0; }
+
+    /* ── Telemetry widget glow states ── */
+    .telem-hit  { border-color: rgba(34,197,94,0.4) !important; box-shadow: 0 0 20px rgba(34,197,94,0.08); }
+    .telem-fault{ border-color: rgba(239,68,68,0.4) !important; box-shadow: 0 0 20px rgba(239,68,68,0.08); }
+    .telem-idle { border-color: rgba(255,255,255,0.05) !important; box-shadow: none; }
+
+    /* ── Animations ── */
+    @keyframes badge-pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.82;transform:scale(.97)} }
+    @keyframes neon-flicker { 0%,100%{opacity:1}45%{opacity:.85}50%{opacity:1}55%{opacity:.9} }
+    .neon-label { animation: neon-flicker 4s ease-in-out infinite; }
+    
+    /* ── Divider ── */
+    .panel-divider { height: 1px; background: #23283b; margin: 0 -1.25rem; }
+  </style>
+</head>
+<body class="h-screen flex flex-col text-sm select-none bg-[#0b0e14]">
+
+<header class="flex-shrink-0 h-16 border-b flex items-center justify-between px-6 z-20 relative bg-[#131722] border-[#23283b]">
+  <div class="flex items-center gap-3">
+    <div class="relative w-9 h-9 rounded-lg flex items-center justify-center bg-[#ccff00] shadow-[0_0_15px_rgba(204,255,0,0.3)]">
+      <span class="text-[#0b0e14] font-black text-lg leading-none neon-label">S</span>
+    </div>
+    <div>
+      <h1 class="font-black tracking-tight text-white leading-none text-base">Serve Simulator <span class="text-[#22d3ee]">PRO</span></h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 mt-0.5">Hawk-Eye · Tactical Ballistics Lab</p>
+    </div>
+  </div>
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-[#22d3ee]">
+      <div class="w-1.5 h-1.5 rounded-full bg-[#22d3ee] shadow-[0_0_8px_#22d3ee] animate-pulse"></div>
+      Live Simulation
+    </div>
+    <div class="text-[10px] font-mono px-3 py-1.5 rounded-md border border-[#23283b] bg-[#1a1f2e] text-slate-400">
+      🖱️ ЛКМ — орбита · Колесо — зум
+    </div>
+  </div>
+</header>
+
+<div class="flex-1 flex overflow-hidden">
+  
+  <aside class="flex-shrink-0 w-80 flex flex-col overflow-y-auto bg-[#131722] border-r border-[#23283b] hidden lg:flex">
+    <div class="p-6 space-y-6 flex-1">
+
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-3">Ведущая рука</p>
+        <div class="flex gap-2">
+          <button id="hand-left" onclick="setHand('left')" class="flex-1 tab-btn py-2 text-sm">Левая</button>
+          <button id="hand-right" onclick="setHand('right')" class="flex-1 tab-btn py-2 text-sm active">Правая</button>
+        </div>
+      </div>
+
+      <div>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-3">Тип подачи</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="serve-pendulum" onclick="setServe('pendulum')" class="tab-btn active">Маятник</button>
+          <button id="serve-reverse" onclick="setServe('reverse')" class="tab-btn">Обр. маятник</button>
+          <button id="serve-tomahawk" onclick="setServe('tomahawk')" class="tab-btn">Томагавк</button>
+          <button id="serve-ghost" onclick="setServe('ghost')" class="tab-btn">Призрак</button>
+          <button id="serve-high" onclick="setServe('high')" class="tab-btn col-span-2">Высокий подброс</button>
+        </div>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <div class="space-y-5">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">Кастомизация подачи</p>
+
+        <div class="ctrl-group space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-medium text-slate-300">Высота подброса</label>
+            <span id="lbl-tossHeight" class="val-pill">0.5 <span class="opacity-50 font-normal">м</span></span>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-bg"></div>
+            <div id="fill-tossHeight" class="slider-fill"></div>
+            <input type="range" id="sl-tossHeight" min="0.16" max="3.0" step="0.05" value="0.5" oninput="onParam('tossHeight',+this.value)">
+          </div>
+        </div>
+
+        <div class="ctrl-group space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-medium text-slate-300">Точка удара (от стола)</label>
+            <span id="lbl-impactHeight" class="val-pill">0.2 <span class="opacity-50 font-normal">м</span></span>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-bg"></div>
+            <div id="fill-impactHeight" class="slider-fill"></div>
+            <input type="range" id="sl-impactHeight" min="0.05" max="0.5" step="0.01" value="0.2" oninput="onParam('impactHeight',+this.value)">
+          </div>
+        </div>
+
+        <div class="ctrl-group space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-medium text-slate-300">Резкость кисти (Вращение)</label>
+            <span id="lbl-wristSnap" class="val-pill">100 <span class="opacity-50 font-normal">%</span></span>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-bg"></div>
+            <div id="fill-wristSnap" class="slider-fill"></div>
+            <input type="range" id="sl-wristSnap" min="20" max="180" step="5" value="100" oninput="onParam('wristSnap',+this.value)">
+          </div>
+        </div>
+
+        <div class="ctrl-group space-y-2">
+          <div class="flex justify-between items-center">
+            <label class="text-xs font-medium text-slate-300">Коррекция скорости</label>
+            <span id="lbl-speedMod" class="val-pill">0.0 <span class="opacity-50 font-normal">м/с</span></span>
+          </div>
+          <div class="slider-wrap">
+            <div class="slider-bg"></div>
+            <div id="fill-speedMod" class="slider-fill"></div>
+            <input type="range" id="sl-speedMod" min="-2.0" max="3.0" step="0.1" value="0.0" oninput="onParam('speedMod',+this.value)">
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="p-6 pt-0 flex-shrink-0">
+      <button id="genBtn" onclick="generateServe()" class="generate-btn w-full py-3.5 rounded-lg text-[11px] tracking-[0.15em] uppercase shadow-[0_0_15px_rgba(204,255,0,0.2)]">
+        Сгенерировать подачу
+      </button>
+    </div>
+  </aside>
+
+  <main class="flex-1 min-w-0 flex flex-col relative bg-[#0b0e14]">
+    <div id="canvasContainer" class="flex-1 relative overflow-hidden min-h-0 w-full h-full">
+      <canvas id="mainCanvas" class="absolute inset-0"></canvas>
+
+      <div id="topViewContainer" class="absolute top-4 left-4 w-44 h-64 bg-[#131722]/80 backdrop-blur-md border border-[#23283b] rounded-xl p-3 z-30 flex flex-col shadow-2xl hidden">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 text-center">Вид сверху</p>
+        <canvas id="topCanvas" class="w-full flex-1 bg-[#0b0e14]/50 rounded-lg border border-[#23283b]"></canvas>
+      </div>
+
+      <div id="placeholderOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#0b0e14] select-none z-10">
+        <div class="text-7xl mb-6 opacity-10">🏓</div>
+        <p class="text-xl font-bold text-slate-500 mb-2 tracking-wide">Serve Video Simulator</p>
+        <p class="text-sm text-slate-600">Настройте параметры и запустите рендеринг</p>
+      </div>
+
+      <div id="loaderOverlay" class="absolute inset-0 bg-[#0b0e14]/90 backdrop-blur-sm hidden flex flex-col items-center justify-center z-20 select-none">
+        <div class="w-80 text-center">
+          <div class="text-4xl mb-4 animate-bounce">🎬</div>
+          <p class="text-sm font-bold text-white mb-3 uppercase tracking-widest">Рендеринг траектории...</p>
+          <div class="h-1.5 bg-[#1a1f2e] rounded-full mx-8 overflow-hidden">
+            <div id="loaderBar" class="h-full bg-[#ccff00]" style="width:0%"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="outcomeBadge" class="absolute top-4 right-4 hidden px-4 py-2 rounded-lg font-bold text-sm tracking-wider uppercase border bg-[#131722]/90 backdrop-blur-sm z-10" style="animation:badge-pulse 1.2s ease-in-out infinite"></div>
+    </div>
+
+    <div id="playerBar" class="flex-shrink-0 bg-[#131722] border-t border-[#23283b] px-5 py-3.5 space-y-3 w-full">
+      <div class="flex items-center gap-4">
+        <span id="timeDisplay" class="text-xs font-mono text-slate-400 w-12 text-right flex-shrink-0">0.0s</span>
+        <div class="flex-1 relative h-2.5 flex items-center cursor-pointer group" onclick="seekToClick(event)">
+          <div class="absolute inset-x-0 h-1 bg-[#1a1f2e] rounded-full group-hover:h-1.5 transition-all"></div>
+          <div id="timelineFill" class="absolute left-0 h-1 bg-[#22d3ee] rounded-full pointer-events-none group-hover:h-1.5 transition-all" style="width:0%"></div>
+          <div id="timelineThumb" class="absolute w-3 h-3 rounded-full bg-white shadow-[0_0_8px_rgba(34,211,238,0.5)] pointer-events-none" style="left:0%; transform:translate(-50%,0)"></div>
+        </div>
+        <span id="durationDisplay" class="text-xs font-mono text-slate-500 w-12 flex-shrink-0">10.0s</span>
+      </div>
+
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <button id="playPauseBtn" onclick="togglePlayPause()" class="ctrl-btn">
+            <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-white ml-0.5"><path d="M8 5v14l11-7z"/></svg>
+            <svg id="pauseIcon" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4 text-white hidden"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+          </button>
+          <button onclick="replayVideo()" class="ctrl-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4 text-white"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
+          </button>
+        </div>
+        <div class="text-[10px] uppercase tracking-wider text-slate-500 flex items-center gap-4 hidden lg:flex">
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-600"></div> Стойка</span>
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div> Подброс</span>
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-[#22d3ee]"></div> Полет</span>
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-[#a855f7]"></div> Анализ</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <aside class="flex-shrink-0 w-72 flex flex-col overflow-y-auto bg-[#131722] border-l border-[#23283b] hidden lg:flex">
+    <div id="coachPanel" class="hidden flex-1 flex-col">
+      <div class="px-5 pt-5 pb-4 border-b border-[#23283b]">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">Мониторинг · Hawk-Eye</p>
+      </div>
+      <div class="p-5 space-y-4 flex-1">
+
+        <div id="coachStatusCard" class="rounded-xl p-4 border border-white/5 bg-white/5 backdrop-blur-sm transition-all duration-500 telem-idle">
+          <p id="coachStatusTitle" class="font-bold text-sm text-white leading-tight">Ожидание...</p>
+          <p id="coachStatusDesc" class="text-xs mt-1.5 text-slate-400"></p>
+        </div>
+
+        <div id="telemWidget" class="rounded-xl p-4 border border-white/5 bg-white/5 backdrop-blur-sm transition-all duration-500 telem-idle">
+          <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-4">Телеметрия</p>
+          <div class="space-y-3">
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-slate-400">Высота (Z)</span>
+              <span id="rt-height" class="text-sm font-mono font-bold text-white">0.00 м</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-slate-400">Скорость</span>
+              <span id="rt-speed" class="text-sm font-mono font-bold text-white">0.0 м/с</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span class="text-xs text-slate-400">Сила Магнуса</span>
+              <span id="rt-magnus" class="text-sm font-mono font-bold text-white">0.00 м/с²</span>
+            </div>
+          </div>
+        </div>
+
+        <div id="coachAnalysis" class="hidden rounded-xl p-4 border border-[#a855f7]/30 bg-[#a855f7]/10 backdrop-blur-sm transition-all duration-500">
+          <p class="text-[10px] uppercase tracking-widest text-[#d8b4fe] mb-2">Физический разбор</p>
+          <p id="coachAnalysisText" class="text-xs leading-relaxed text-slate-300"></p>
+        </div>
+
+      </div>
+    </div>
+  </aside>
+</div>
+
+<script>
+'use strict';
+
+const P = { hand: 'right', serveType: 'pendulum', tossHeight: 0.5, impactHeight: 0.2, wristSnap: 100, speedMod: 0.0 };
+
+const SERVES = {
+  'pendulum': { 
+    name: 'Маятник', speed: 3.4, va: -6, ha: -22, baseTop: -900, baseSide: -4800,
+    desc: 'Боковое правое + нижнее вращение. Воздушная траектория круто выгибается в правый бок от принимающего, а при отскоке мяч резко "выстреливает" в сторону.'
+  },
+  'reverse': { 
+    name: 'Обратный маятник', speed: 3.5, va: -6, ha: 20, baseTop: -700, baseSide: 4800,
+    desc: 'Зеркальное левое вращение. Траектория искривляется в левую сторону. Мяч уводит ракетку соперника наружу.'
+  },
+  'tomahawk': { 
+    name: 'Томагавк', speed: 3.9, va: -2, ha: -14, baseTop: 1800, baseSide: 4000,
+    desc: 'Верхне-боковое вращение. За счет эффекта Магнуса мяч стремительно вжимается вниз-вправо, приобретая огромную скорость после соударения.'
+  },
+  'ghost': { 
+    name: 'Призрачная подача', speed: 2.5, va: -20, ha: -2, baseTop: -7500, baseSide: 0,
+    desc: 'Экстремальное нижнее вращение (Backspin). Мяч испытывает огромную подъемную силу в полете, а после отскока сила трения заставляет его катиться обратно к сетке!'
+  },
+  'high': { 
+    name: 'Высокий подброс', speed: 3.8, va: -4, ha: -16, baseTop: 600, baseSide: -2500,
+    desc: 'Мяч летит по крутой дуге вниз из-за гравитации, аккумулируя скорость. Вращение тяжело прочитать из-за высокой скорости сближения.'
+  }
+};
+
+const SCFG = {
+  tossHeight: {min: 0.16, max: 3.0, fmt: v=>v.toFixed(2)},
+  impactHeight: {min: 0.05, max: 0.5, fmt: v=>v.toFixed(2)},
+  wristSnap: {min: 20, max: 180, fmt: v=>v.toFixed(0)},
+  speedMod: {min: -2.0, max: 3.0, fmt: v=>v.toFixed(1)}
+};
+
+function setHand(h){
+  P.hand = h;
+  document.getElementById('hand-left').classList.toggle('active', h==='left');
+  document.getElementById('hand-right').classList.toggle('active', h==='right');
+  if(G_res) { calculateCurrentServe(); renderStill(); }
+}
+
+function setServe(s){
+  P.serveType = s;
+  Object.keys(SERVES).forEach(k=>{ document.getElementById('serve-'+k).classList.toggle('active', k===s); });
+  if (s === 'high') { onParam('tossHeight', 2.2); document.getElementById('sl-tossHeight').value = 2.2; }
+  else { onParam('tossHeight', 0.5); document.getElementById('sl-tossHeight').value = 0.5; }
+  if(G_res) { calculateCurrentServe(); renderStill(); }
+}
+
+function onParam(id, val){
+  P[id] = val;
+  const c = SCFG[id];
+  if(c){
+    const pct = ((val-c.min)/(c.max-c.min))*100;
+    document.getElementById('fill-'+id).style.width = pct+'%';
+    document.getElementById('lbl-'+id).childNodes[0].nodeValue = c.fmt(val) + ' ';
+  }
+  if(G_res) { calculateCurrentServe(); renderStill(); }
+}
+
+// CALIBRATED BALLISTIC PHYSICS ENGINE
+const BALL_M  = 0.0027, BALL_D = 0.040, BALL_R = 0.020, AIR_RHO = 1.29, G_GRAV = 9.81;
+const CD = 0.40, BALL_A = Math.PI * BALL_R * BALL_R;
+const TBL_HL = 1.37, TBL_HW = 0.7625, NET_H = 0.1525, DT = 0.001;
+const MF = 0.0058; // Calibrated Magnus Multiplier (Acceleration factor)
+
+function mag3(v){return Math.sqrt(v[0]**2+v[1]**2+v[2]**2);}
+function rpmToRad(rpm){return rpm*2*Math.PI/60;}
+function cross3(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+
+function simulateServe(){
+  const sCfg = SERVES[P.serveType];
+  const snapMult = P.wristSnap / 100;
+  
+  const spd = Math.max(1.2, sCfg.speed + P.speedMod);
+  const va = sCfg.va * Math.PI/180;
+  let ha = sCfg.ha * Math.PI/180;
+  
+  let topSpn = sCfg.baseTop * snapMult;
+  let sideSpn = sCfg.baseSide * snapMult;
+  
+  let startX = 0.35; 
+  if(P.hand === 'left'){ startX = -0.35; ha = -ha; sideSpn = -sideSpn; }
+
+  let px = startX;
+  let py = -1.45; 
+  let pz = P.impactHeight; 
+  
+  let vx = spd * Math.cos(va) * Math.sin(ha);
+  let vy = spd * Math.cos(va) * Math.cos(ha);
+  let vz = spd * Math.sin(va);
+  
+  let sx = -rpmToRad(topSpn);
+  let sy = 0;
+  let sz = rpmToRad(sideSpn);
+
+  const traj = [];
+  const bounces = [];
+  let t = 0;
+  let lastSaveT = 0;
+  let outcome = 'hit', faultReason = '';
+  traj.push({x:px, y:py, z:pz, spd, mg:0, t:0, vx, vy, vz, sx, sy, sz, bIdx: bounces.length});
+
+  while(t < 2.2){
+    const v = [vx,vy,vz];
+    const vMag = mag3(v);
+    
+    let fdx=0,fdy=0,fdz=0;
+    if(vMag > 1e-4){
+      const df = -0.5*CD*AIR_RHO*BALL_A*vMag/BALL_M;
+      fdx=df*vx; fdy=df*vy; fdz=df*vz;
+    }
+    
+    // MAGNUS FORCE ACCELERATION VECTORS
+    const om = [sx,sy,sz];
+    const omv = cross3(om,v);
+    const fmx = MF * omv[0];
+    const fmy = MF * omv[1];
+    const fmz = MF * omv[2];
+    const mgAcc = mag3([fmx, fmy, fmz]);
+
+    const ax = fdx+fmx, ay = fdy+fmy, az = -G_GRAV+fdz+fmz;
+    const nvx=vx+ax*DT, nvy=vy+ay*DT, nvz=vz+az*DT;
+    const npx=px+vx*DT, npy=py+vy*DT, npz=pz+vz*DT;
+    t += DT;
+
+    // Net collision check
+    if(py < 0 && npy >= 0){
+      const tf = -py/(npy-py);
+      const zNet = pz+tf*(npz-pz);
+      const xNet = px+tf*(npx-px);
+      if(zNet <= NET_H && Math.abs(xNet) <= TBL_HW){
+        outcome='fault'; faultReason='Сетка!';
+        traj.push({x:xNet, y:0, z:zNet, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx,vy,vz,sx,sy,sz, bIdx: bounces.length});
+        break;
+      }
+    }
+
+    // --- НАЧАЛО БЛОКА ОТСКОКА ---
+    if(npz <= 0 && nvz < 0){
+      const inTbl = Math.abs(npx)<=TBL_HW && Math.abs(npy)<=TBL_HL;
+      
+      traj.push({x:npx, y:npy, z:0, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx:nvx, vy:nvy, vz:-nvz*0.82, sx, sy, sz, bIdx: bounces.length});
+      bounces.push({pos:{x:npx,y:npy,z:0}, t});
+      
+      if(!inTbl){ 
+        if(bounces.length <= 2) { outcome = 'fault'; faultReason = bounces.length === 1 ? 'Аут!' : 'Аут за стол!'; }
+        else { outcome = 'hit'; }
+        break; 
+      } 
+      
+      if(bounces.length === 1 && npy > 0){ outcome = 'fault'; faultReason = 'Без отскока у себя!'; break; }
+      if(bounces.length === 2 && npy < 0){ outcome = 'fault'; faultReason = 'Два отскока у себя!'; break; }
+      if(bounces.length === 3){ outcome = 'hit'; break; }
+      
+      const spinFrictionX = sz * BALL_R * 0.015;
+      const spinFrictionY = -sx * BALL_R * 0.015;
+      const clampX = Math.max(-1.5, Math.min(1.5, spinFrictionX));
+      const clampY = Math.max(-1.5, Math.min(1.5, spinFrictionY));
+
+      vz = -nvz * 0.85; 
+      vx = nvx * 0.90 + clampX; 
+      vy = nvy * 0.90 + clampY;  
+      sx*=0.6; sy*=0.6; sz*=0.6;
+      
+      px=npx; py=npy; pz=0; // Строгая привязка к поверхности
+      continue;
+    }
+    // --- КОНЕЦ БЛОКА ОТСКОКА ---
+
+    if(Math.abs(px) > TBL_HW || npy > TBL_HL) { 
+       if(bounces.length >= 2) { outcome='hit'; } else { outcome='fault'; faultReason='Аут!'; }
+       break;
+    }
+
+    px=npx; py=npy; pz=Math.max(npz,0);
+    vx=nvx; vy=nvy; vz=nvz;
+
+    if(t - lastSaveT >= 0.01){
+      traj.push({x:px, y:py, z:pz, spd:mag3([vx,vy,vz]), mg:mgAcc, t, vx, vy, vz, sx, sy, sz, bIdx: bounces.length});
+      lastSaveT = t;
+    }
+  }
+
+  return {traj, bounces, outcome, faultReason, duration: t, sCfg, startX};
+}
+
+// INTERACTIVE ORBIT CAMERA DEFS
+let CAM_EYE = [0, -2.4, 0.85];
+const CAM_TARGET = [0, 0.6, 0.12];
+const CAM_UP_W = [0, 0, 1];
+const CAM_FOV = 55;
+let camBasis = null;
+
+let camTheta = -Math.PI / 2;
+let camPhi = 0.22;
+let camRadius = 3.1;
+let isDraggingCamera = false;
+let previousMouseX = 0;
+let previousMouseY = 0;
+
+function updateCameraPosition(){
+  CAM_EYE[0] = CAM_TARGET[0] + camRadius * Math.cos(camPhi) * Math.sin(camTheta);
+  CAM_EYE[1] = CAM_TARGET[1] + camRadius * Math.cos(camPhi) * Math.cos(camTheta);
+  CAM_EYE[2] = CAM_TARGET[2] + camRadius * Math.sin(camPhi);
+  buildCam();
+}
+
+function buildCam(){
+  const f = norm3(sub3(CAM_TARGET, CAM_EYE));
+  const r = norm3(cross3b(f, CAM_UP_W));
+  const u = cross3b(r, f);
+  camBasis = {f,r,u};
+}
+
+function sub3(a,b){return[a[0]-b[0],a[1]-b[1],a[2]-b[2]];}
+function dot3(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2];}
+function norm3(a){const l=mag3(a);return l<1e-10?[0,0,1]:[a[0]/l,a[1]/l,a[2]/l];}
+function cross3b(a,b){return[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];}
+
+function proj(pt, W, H){
+  const d  = sub3(pt, CAM_EYE);
+  const cx = dot3(d, camBasis.r);
+  const cy = dot3(d, camBasis.u);
+  const cz = dot3(d, camBasis.f);
+  if(cz <= 0.01) return null;
+  const fov2 = CAM_FOV * Math.PI / 360;
+  const f  = 1 / Math.tan(fov2);
+  const asp= W / H;
+  return { x: (0.5 + (cx * f) / (cz * asp))*W, y: (0.5 - (cy * f) / cz)*H, z: cz };
+}
+
+// MASTER ANIMATION CONTROLLER
+let G_res = null;
+const animState = { playing: false, rafId: null, wallStart: null, masterTime: 0, trail: [], bounceEffects: [] };
+
+function calculateCurrentServe(){
+  G_res = simulateServe();
+}
+
+function getBallStateAtTime(t){
+  if(!G_res) return null;
+  const sx = G_res.startX;
+  const sy = -1.45;
+  const baseZ = 0.15 + P.impactHeight;
+  const peakZ = baseZ + P.tossHeight;
+  
+  if (t < 2.0) {
+    return { x: sx, y: sy, z: baseZ, spd: 0, mg: 0, phase: 'focus' };
+  } 
+  else if (t < 4.0) {
+    const tt = (t - 2.0) / 2.0; 
+    const z = baseZ + 4 * (peakZ - baseZ) * tt * (1 - tt);
+    const speedEstimate = Math.abs(1 - 2*tt) * Math.sqrt(2 * G_GRAV * P.tossHeight);
+    return { x: sx, y: sy, z: z, spd: speedEstimate, mg: 0, phase: 'toss' };
+  }
+  else if (t < 6.0) {
+    const frac = (t - 4.0) / 2.0;
+    const ft = frac * G_res.duration;
+    return { ...interpolateTraj(G_res.traj, ft), phase: 'flight' };
+  }
+  else {
+    const frac = (t - 6.0) / 4.0;
+    const ft = Math.min(frac * G_res.duration, G_res.duration);
+    return { ...interpolateTraj(G_res.traj, ft), phase: 'replay' };
+  }
+}
+
+function interpolateTraj(traj, t){
+  if(t<=0) return traj[0];
+  if(t>=traj[traj.length-1].t) return traj[traj.length-1];
+  let lo=0, hi=traj.length-1;
+  while(lo<hi){
+    const mid=Math.floor((lo+hi)/2);
+    if(traj[mid].t<t) lo=mid+1; else hi=mid;
+  }
+  const p0=traj[lo-1], p1=traj[lo];
+  const a = (t-p0.t)/(p1.t-p0.t+1e-12);
+  return {
+    x:p0.x+(p1.x-p0.x)*a, y:p0.y+(p1.y-p0.y)*a, z:p0.z+(p1.z-p0.z)*a,
+    vx:p0.vx+(p1.vx-p0.vx)*a, vy:p0.vy+(p1.vy-p0.vy)*a, vz:p0.vz+(p1.vz-p0.vz)*a,
+    sx:p0.sx+(p1.sx-p0.sx)*a, sy:p0.sy+(p1.sy-p0.sy)*a, sz:p0.sz+(p1.sz-p0.sz)*a,
+    spd:p0.spd+(p1.spd-p0.spd)*a, mg:p0.mg+(p1.mg-p0.mg)*a, t
+  };
+}
+
+// 3D RENDERING LOOP
+const canvas = document.getElementById('mainCanvas');
+const ctx = canvas.getContext('2d');
+const topCanvas = document.getElementById('topCanvas');
+const topCtx = topCanvas.getContext('2d');
+
+function resizeCanvas(){
+  const container = document.getElementById('canvasContainer');
+  const rect = container.getBoundingClientRect();
+  const dpr = window.devicePixelRatio || 1;
+  
+  canvas.width = rect.width * dpr; canvas.height = rect.height * dpr;
+  canvas.style.width = rect.width + 'px'; canvas.style.height = rect.height + 'px';
+
+  const topRect = document.getElementById('topViewContainer').getBoundingClientRect();
+  topCanvas.width = topRect.width * dpr; topCanvas.height = (topRect.height - 25) * dpr;
+}
+
+window.addEventListener('resize', ()=>{ resizeCanvas(); renderStill(); });
+
+// CAMERA ORBIT MOUSE EVENT LISTENERS
+canvas.addEventListener('mousedown', (e)=>{
+  if(e.button === 0) {
+    isDraggingCamera = true;
+    previousMouseX = e.clientX; previousMouseY = e.clientY;
+  }
+});
+
+window.addEventListener('mousemove', (e)=>{
+  if(!isDraggingCamera) return;
+  const dx = e.clientX - previousMouseX;
+  const dy = e.clientY - previousMouseY;
+  
+  camTheta += dx * 0.007;
+  camPhi = Math.max(0.04, Math.min(Math.PI/2 - 0.05, camPhi + dy * 0.006));
+  
+  previousMouseX = e.clientX; previousMouseY = e.clientY;
+  updateCameraPosition();
+  renderStill();
+});
+
+window.addEventListener('mouseup', ()=>{ isDraggingCamera = false; });
+
+canvas.addEventListener('wheel', (e) => {
+  e.preventDefault();
+  camRadius += e.deltaY * 0.0025;
+  camRadius = Math.max(1.2, Math.min(5.5, camRadius));
+  updateCameraPosition();
+  renderStill();
+}, { passive: false });
+
+function renderFrame(t){
+  const bSt = getBallStateAtTime(t);
+  if(!bSt) return;
+
+  // Build trail tracking
+  if(bSt.phase === 'flight' || bSt.phase === 'replay'){
+    animState.trail.push({x:bSt.x, y:bSt.y, z:bSt.z});
+    if(animState.trail.length > 60) animState.trail.shift();
+  } else { animState.trail = []; }
+
+  // Anim bounce shockwaves
+  animState.bounceEffects = [];
+  if(bSt.phase === 'flight' || bSt.phase === 'replay'){
+    const checkT = bSt.phase === 'flight' ? ((t - 4.0)/2.0 * G_res.duration) : bSt.t;
+    G_res.bounces.forEach(b => {
+      const age = checkT - b.t;
+      if(age >= 0 && age < 0.45) animState.bounceEffects.push({pos:b.pos, age: age/0.45});
+    });
+  }
+
+  const dpr = window.devicePixelRatio||1;
+  ctx.save(); ctx.scale(dpr,dpr);
+  draw3DScene(canvas.width/dpr, canvas.height/dpr, bSt);
+  ctx.restore();
+
+  topCtx.save(); topCtx.scale(dpr,dpr);
+  draw2DMap(topCanvas.width/dpr, topCanvas.height/dpr, bSt);
+  topCtx.restore();
+}
+
+function renderStill(){
+  if(G_res) renderFrame(animState.masterTime);
+}
+
+function draw3DScene(W, H, bSt){
+  // ── Background gradient ──
+  const bgGrd = ctx.createLinearGradient(0,0,0,H);
+  bgGrd.addColorStop(0,'#0b0e14'); bgGrd.addColorStop(1,'#131722');
+  ctx.fillStyle=bgGrd; ctx.fillRect(0,0,W,H);
+
+  // ── Subtle floor grid ──
+  ctx.strokeStyle='rgba(56,189,248,0.04)'; ctx.lineWidth=1;
+  for(let i=-4;i<=4;i++){
+    const p1=proj([i,-3,0],W,H), p2=proj([i,3.5,0],W,H);
+    if(p1&&p2){ctx.beginPath();ctx.moveTo(p1.x,p1.y);ctx.lineTo(p2.x,p2.y);ctx.stroke();}
+    const q1=proj([-4,i-1,0],W,H), q2=proj([4,i-1,0],W,H);
+    if(q1&&q2){ctx.beginPath();ctx.moveTo(q1.x,q1.y);ctx.lineTo(q2.x,q2.y);ctx.stroke();}
+  }
+
+  // ── TABLE LEGS (4 corners + 2 center) ──
+  const LEG_H = -0.72;
+  const legPositions = [
+    [-TBL_HW+0.06, -TBL_HL+0.06], [TBL_HW-0.06, -TBL_HL+0.06],
+    [TBL_HW-0.06,  TBL_HL-0.06], [-TBL_HW+0.06,  TBL_HL-0.06],
+    [0, -TBL_HL+0.06], [0, TBL_HL-0.06]
+  ];
+  ctx.lineWidth = 4; ctx.strokeStyle='#334155';
+  legPositions.forEach(([lx,ly])=>{
+    const lt=proj([lx,ly,0],W,H), lb=proj([lx,ly,LEG_H],W,H);
+    if(lt&&lb){ctx.beginPath();ctx.moveTo(lt.x,lt.y);ctx.lineTo(lb.x,lb.y);ctx.stroke();}
+  });
+  // horizontal cross-brace
+  ctx.lineWidth=2.5; ctx.strokeStyle='#1e293b';
+  const cb = [
+    [[-TBL_HW+0.06,-TBL_HL+0.06,LEG_H*0.5],[TBL_HW-0.06,-TBL_HL+0.06,LEG_H*0.5]],
+    [[-TBL_HW+0.06, TBL_HL-0.06,LEG_H*0.5],[TBL_HW-0.06, TBL_HL-0.06,LEG_H*0.5]],
+    [[-TBL_HW+0.06,-TBL_HL+0.06,LEG_H*0.5],[-TBL_HW+0.06, TBL_HL-0.06,LEG_H*0.5]],
+    [[ TBL_HW-0.06,-TBL_HL+0.06,LEG_H*0.5],[ TBL_HW-0.06, TBL_HL-0.06,LEG_H*0.5]]
+  ];
+  cb.forEach(([a,b])=>{
+    const pa=proj(a,W,H), pb=proj(b,W,H);
+    if(pa&&pb){ctx.beginPath();ctx.moveTo(pa.x,pa.y);ctx.lineTo(pb.x,pb.y);ctx.stroke();}
+  });
+
+  // ── TABLE SURFACE ──
+  const RIM = 0.04;  // rim depth (m)
+  const tblCorners = [[-TBL_HW,-TBL_HL],[TBL_HW,-TBL_HL],[TBL_HW,TBL_HL],[-TBL_HW,TBL_HL]];
+  const topPts  = tblCorners.map(([x,y])=>proj([x,y,0],W,H));
+  const rimPts  = tblCorners.map(([x,y])=>proj([x,y,-RIM],W,H));
+
+  // Rim sides (four faces)
+  if(topPts.every(Boolean) && rimPts.every(Boolean)){
+    const rimFaces=[[0,1],[1,2],[2,3],[3,0]];
+    rimFaces.forEach(([a,b])=>{
+      // face fill
+      ctx.fillStyle='#1e293b';
+      ctx.beginPath();
+      ctx.moveTo(topPts[a].x,topPts[a].y); ctx.lineTo(topPts[b].x,topPts[b].y);
+      ctx.lineTo(rimPts[b].x,rimPts[b].y); ctx.lineTo(rimPts[a].x,rimPts[a].y);
+      ctx.fill();
+      // rim edge highlight
+      ctx.strokeStyle='rgba(148,163,184,0.25)'; ctx.lineWidth=1;
+      ctx.stroke();
+    });
+
+    // Playing surface — premium deep blue
+    const surfGrd = ctx.createLinearGradient(topPts[0].x, topPts[0].y, topPts[2].x, topPts[2].y);
+    surfGrd.addColorStop(0,'#162e5c'); surfGrd.addColorStop(0.5,'#1b3a6b'); surfGrd.addColorStop(1,'#162e5c');
+    ctx.fillStyle = surfGrd;
+    ctx.beginPath(); ctx.moveTo(topPts[0].x,topPts[0].y);
+    topPts.forEach((p,i)=>{ if(i>0) ctx.lineTo(p.x,p.y); });
+    ctx.fill();
+
+    // Table edge white border (top)
+    ctx.strokeStyle='rgba(255,255,255,0.55)'; ctx.lineWidth=1.8;
+    ctx.beginPath(); ctx.moveTo(topPts[0].x,topPts[0].y);
+    topPts.forEach((p,i)=>{ if(i>0) ctx.lineTo(p.x,p.y); });
+    ctx.closePath(); ctx.stroke();
+
+    // Center longitudinal white line
+    const cL1=proj([0,-TBL_HL,0],W,H), cL2=proj([0,TBL_HL,0],W,H);
+    if(cL1&&cL2){ ctx.beginPath(); ctx.moveTo(cL1.x,cL1.y); ctx.lineTo(cL2.x,cL2.y); ctx.strokeStyle='rgba(255,255,255,0.45)'; ctx.lineWidth=1.2; ctx.stroke(); }
+
+    // Center lateral white line (divides table half)
+    const hL1=proj([-TBL_HW,0,0],W,H), hL2=proj([TBL_HW,0,0],W,H);
+    if(hL1&&hL2){ ctx.beginPath(); ctx.moveTo(hL1.x,hL1.y); ctx.lineTo(hL2.x,hL2.y); ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.stroke(); }
+
+    // Subtle surface glare reflection
+    const glare = ctx.createLinearGradient(topPts[0].x, topPts[0].y, topPts[1].x, topPts[1].y);
+    glare.addColorStop(0,'rgba(255,255,255,0)'); glare.addColorStop(0.35,'rgba(255,255,255,0.06)'); glare.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=glare;
+    ctx.beginPath(); ctx.moveTo(topPts[0].x,topPts[0].y);
+    topPts.forEach((p,i)=>{ if(i>0) ctx.lineTo(p.x,p.y); });
+    ctx.fill();
+  }
+
+  // ── ITTF NET WITH POSTS EXTENDING 15.25cm BEYOND TABLE ──
+  const POST_EXT = 0.1525; // ITTF: posts extend 15.25cm beyond table sides
+  const netLX = -TBL_HW - POST_EXT, netRX = TBL_HW + POST_EXT;
+
+  // Net posts (steel cylinders)
+  const postL_t = proj([netLX, 0, NET_H + 0.01], W, H);
+  const postL_b = proj([netLX, 0, -0.04],          W, H);
+  const postR_t = proj([netRX, 0, NET_H + 0.01], W, H);
+  const postR_b = proj([netRX, 0, -0.04],          W, H);
+  ctx.lineWidth = 5.5; ctx.strokeStyle = '#64748b';
+  ctx.lineCap = 'round';
+  if(postL_t&&postL_b){ ctx.beginPath(); ctx.moveTo(postL_t.x,postL_t.y); ctx.lineTo(postL_b.x,postL_b.y); ctx.stroke(); }
+  if(postR_t&&postR_b){ ctx.beginPath(); ctx.moveTo(postR_t.x,postR_t.y); ctx.lineTo(postR_b.x,postR_b.y); ctx.stroke(); }
+  // Post caps
+  ctx.fillStyle='#94a3b8';
+  if(postL_t){ ctx.beginPath(); ctx.arc(postL_t.x,postL_t.y,4,0,Math.PI*2); ctx.fill(); }
+  if(postR_t){ ctx.beginPath(); ctx.arc(postR_t.x,postR_t.y,4,0,Math.PI*2); ctx.fill(); }
+  ctx.lineCap = 'butt';
+
+  // Net fabric
+  const nTL=proj([netLX,0,NET_H],W,H), nTR=proj([netRX,0,NET_H],W,H);
+  const nBL=proj([netLX,0,0],W,H),     nBR=proj([netRX,0,0],W,H);
+  if(nTL&&nTR&&nBL&&nBR){
+    // Net body
+    ctx.fillStyle='rgba(255,255,255,0.09)';
+    ctx.beginPath(); ctx.moveTo(nTL.x,nTL.y); ctx.lineTo(nTR.x,nTR.y); ctx.lineTo(nBR.x,nBR.y); ctx.lineTo(nBL.x,nBL.y); ctx.fill();
+    // Net mesh lines (horizontal)
+    for(let fi=0;fi<=4;fi++){
+      const frac=fi/4;
+      const hx1=nTL.x+(nBL.x-nTL.x)*frac, hy1=nTL.y+(nBL.y-nTL.y)*frac;
+      const hx2=nTR.x+(nBR.x-nTR.x)*frac, hy2=nTR.y+(nBR.y-nTR.y)*frac;
+      ctx.strokeStyle=`rgba(255,255,255,${fi===0?0.7:0.12})`; ctx.lineWidth=fi===0?1.8:0.8;
+      ctx.beginPath(); ctx.moveTo(hx1,hy1); ctx.lineTo(hx2,hy2); ctx.stroke();
+    }
+    // Net mesh lines (vertical)
+    for(let vi=1;vi<=7;vi++){
+      const frac=vi/8;
+      const vx1=nTL.x+(nTR.x-nTL.x)*frac, vy1=nTL.y+(nTR.y-nTL.y)*frac;
+      const vx2=nBL.x+(nBR.x-nBL.x)*frac, vy2=nBL.y+(nBR.y-nBL.y)*frac;
+      ctx.strokeStyle='rgba(255,255,255,0.08)'; ctx.lineWidth=0.8;
+      ctx.beginPath(); ctx.moveTo(vx1,vy1); ctx.lineTo(vx2,vy2); ctx.stroke();
+    }
+    // Top white tape
+    ctx.strokeStyle='rgba(255,255,255,0.75)'; ctx.lineWidth=2.2;
+    ctx.beginPath(); ctx.moveTo(nTL.x,nTL.y); ctx.lineTo(nTR.x,nTR.y); ctx.stroke();
+  }
+
+  // ── HAWK-EYE TRAJECTORY CURVE ──
+  if(G_res && G_res.traj.length > 1){
+    ctx.lineWidth = 2.5;
+    let currentStroke = '';
+    ctx.beginPath();
+    let first = true;
+    G_res.traj.forEach((pt, i) => {
+      const p = proj([pt.x, pt.y, pt.z], W, H);
+      if(!p) return;
+      // Если индекс отскока 2 (т.е. летит после 2-го касания) - красим в желтый
+      const targetColor = pt.bIdx >= 2 ? '#fde047' : (bSt.phase === 'replay' ? '#a855f7' : '#3b82f6');
+      if(first) {
+         ctx.strokeStyle = targetColor; currentStroke = targetColor; ctx.moveTo(p.x, p.y); first = false;
+      } else {
+         if(targetColor !== currentStroke) {
+            ctx.stroke(); ctx.beginPath(); 
+            const prev = proj([G_res.traj[i-1].x, G_res.traj[i-1].y, G_res.traj[i-1].z], W, H);
+            if(prev) ctx.moveTo(prev.x, prev.y);
+            ctx.strokeStyle = targetColor; currentStroke = targetColor;
+         }
+         ctx.lineTo(p.x, p.y);
+      }
+    });
+    ctx.stroke();
+  }
+
+  // ── BOUNCE SHOCKWAVES — all bounces, both halves ──
+  animState.bounceEffects.forEach(be=>{
+    const sp=proj([be.pos.x,be.pos.y,0],W,H);
+    if(sp){
+      const r = 52*(1+be.age)/Math.max(sp.z,0.1);
+      // outer ring
+      ctx.strokeStyle=`rgba(251,146,60,${(1-be.age)*0.85})`; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.arc(sp.x,sp.y,r,0,Math.PI*2); ctx.stroke();
+      // inner flash
+      ctx.strokeStyle=`rgba(251,146,60,${(1-be.age)*0.4})`; ctx.lineWidth=7;
+      ctx.beginPath(); ctx.arc(sp.x,sp.y,r*0.4,0,Math.PI*2); ctx.stroke();
+      // crosshair marker at bounce point
+      const cs = Math.max(5, 10/Math.max(sp.z,0.1));
+      ctx.strokeStyle=`rgba(251,200,60,${1-be.age*0.5})`; ctx.lineWidth=1.5;
+      ctx.beginPath();
+      ctx.moveTo(sp.x-cs,sp.y-cs); ctx.lineTo(sp.x+cs,sp.y+cs);
+      ctx.moveTo(sp.x+cs,sp.y-cs); ctx.lineTo(sp.x-cs,sp.y+cs);
+      ctx.stroke();
+    }
+  });
+
+  // ── ANIMATED TRAIL DOTS ──
+  if(animState.trail.length>1){
+    animState.trail.forEach((p,i)=>{
+      const sp=proj([p.x,p.y,p.z],W,H);
+      if(sp){
+        ctx.fillStyle = bSt.phase==='replay'?'#c084fc':'#38bdf8';
+        ctx.globalAlpha = (i/animState.trail.length)*0.6;
+        ctx.beginPath(); ctx.arc(sp.x,sp.y,Math.max(1.2,6/Math.max(sp.z,0.1)),0,Math.PI*2); ctx.fill();
+      }
+    });
+    ctx.globalAlpha=1;
+  }
+
+  // ── BUTTERFLY VISCARIA PADDLE ──
+  if(bSt.phase==='focus'||bSt.phase==='toss'||bSt.phase==='flight'){
+    let strikeAnim=0;
+    if(bSt.phase==='flight') strikeAnim=Math.max(0,1-(animState.masterTime-4.0)*4);
+    const handSign = P.hand==='left' ? -1 : 1;
+    const rcX = G_res.startX - strikeAnim*handSign*0.12;
+    const rcY = -1.45 + strikeAnim*0.08;
+    const rcZ = 0.15 + P.impactHeight;
+    const heX = G_res.startX + handSign*0.11;
+
+    const rc = proj([rcX, rcY, rcZ], W, H);
+    const he = proj([heX, -1.56, rcZ-0.09], W, H);
+
+    if(rc && he){
+      const r = Math.max(7, 44/Math.max(rc.z,0.1));
+      const angle = P.hand==='left' ? -0.22 : 0.22;
+
+      // ── Handle (Viscaria stripes) ──
+      const dx=rc.x-he.x, dy=rc.y-he.y;
+      const hLen=Math.sqrt(dx*dx+dy*dy);
+      const hW=r*0.28;
+      if(hLen>2){
+        const ux=dx/hLen, uy=dy/hLen;
+        const px2=-uy*hW, py2=ux*hW;
+        // Handle base
+        ctx.fillStyle='#92400e';
+        ctx.beginPath();
+        ctx.moveTo(he.x+px2,he.y+py2); ctx.lineTo(he.x-px2,he.y-py2);
+        ctx.lineTo(he.x+dx*0.7-px2, he.y+dy*0.7-py2); ctx.lineTo(he.x+dx*0.7+px2, he.y+dy*0.7+py2);
+        ctx.fill();
+        // Butterfly Viscaria stripes (blue/white alternating)
+        const stripeColors=['#1d4ed8','#e2e8f0','#1d4ed8','#e2e8f0','#1d4ed8'];
+        for(let si=0;si<5;si++){
+          const sf=(si+0.5)/5.5;
+          const sw=hW*0.28;
+          const sx0=he.x+dx*sf*0.7+(-uy)*(-hW+si*(hW*2/5));
+          const sy0=he.y+dy*sf*0.7+(ux)*(-hW+si*(hW*2/5));
+          ctx.strokeStyle=stripeColors[si]; ctx.lineWidth=sw;
+          ctx.beginPath();
+          ctx.moveTo(he.x+(-uy)*(-hW+si*(hW*2/5)), he.y+(ux)*(-hW+si*(hW*2/5)));
+          ctx.lineTo(he.x+dx*0.7+(-uy)*(-hW+si*(hW*2/5)), he.y+dy*0.7+(ux)*(-hW+si*(hW*2/5)));
+          ctx.stroke();
+        }
+        // Handle outline
+        ctx.strokeStyle='rgba(0,0,0,0.6)'; ctx.lineWidth=1;
+        ctx.beginPath();
+        ctx.moveTo(he.x+px2,he.y+py2); ctx.lineTo(he.x-px2,he.y-py2);
+        ctx.lineTo(he.x+dx*0.7-px2, he.y+dy*0.7-py2); ctx.lineTo(he.x+dx*0.7+px2, he.y+dy*0.7+py2);
+        ctx.closePath(); ctx.stroke();
+      }
+
+      // ── Blade body ──
+      const rubberColor = P.hand==='left' ? '#dc2626' : '#0f172a';
+      ctx.fillStyle = rubberColor;
+      ctx.beginPath(); ctx.ellipse(rc.x, rc.y, r, r*1.18, angle, 0, Math.PI*2); ctx.fill();
+
+      // Rubber surface texture gradient
+      const rubGrd = ctx.createRadialGradient(rc.x-r*0.2, rc.y-r*0.25, r*0.05, rc.x, rc.y, r*1.1);
+      if(P.hand==='left'){
+        rubGrd.addColorStop(0,'rgba(255,80,80,0.35)'); rubGrd.addColorStop(1,'rgba(0,0,0,0.3)');
+      } else {
+        rubGrd.addColorStop(0,'rgba(80,120,255,0.15)'); rubGrd.addColorStop(1,'rgba(0,0,0,0.4)');
+      }
+      ctx.fillStyle=rubGrd;
+      ctx.beginPath(); ctx.ellipse(rc.x, rc.y, r, r*1.18, angle, 0, Math.PI*2); ctx.fill();
+
+      // ── Spring Sponge ORANGE edge highlight (Tenergy/Dignics style) ──
+      ctx.strokeStyle='#f97316'; ctx.lineWidth=Math.max(1.5, r*0.11);
+      ctx.beginPath(); ctx.ellipse(rc.x, rc.y, r+1, r*1.18+1, angle, 0, Math.PI*2); ctx.stroke();
+
+      // Blade outer rim (dark)
+      ctx.strokeStyle='rgba(0,0,0,0.7)'; ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.ellipse(rc.x, rc.y, r+ctx.lineWidth*0.5+1.5, (r*1.18)+ctx.lineWidth*0.5+1.5, angle, 0, Math.PI*2); ctx.stroke();
+
+      // Butterfly logo dot
+      ctx.fillStyle='rgba(255,255,255,0.18)';
+      ctx.beginPath(); ctx.arc(rc.x-r*0.15*Math.cos(angle), rc.y-r*0.15*Math.sin(angle), r*0.18, 0, Math.PI*2); ctx.fill();
+    }
+  }
+
+  // ── 3D BALL ──
+  const sp = proj([bSt.x, bSt.y, bSt.z], W, H);
+  if(sp){
+    const r = Math.max(5, 17/Math.max(sp.z,0.1));
+    // Shadow
+    const shad = proj([bSt.x, bSt.y, 0], W, H);
+    if(shad&&shad.z>0){
+      ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.beginPath(); ctx.ellipse(shad.x,shad.y,r*1.3,r*0.5,0,0,Math.PI*2); ctx.fill();
+    }
+    // Outer glow halo
+    const haloGrd = ctx.createRadialGradient(sp.x,sp.y,r*0.4,sp.x,sp.y,r*2.4);
+    haloGrd.addColorStop(0,'rgba(255,255,255,0.4)'); haloGrd.addColorStop(1,'rgba(255,255,255,0)');
+    ctx.fillStyle=haloGrd; ctx.beginPath(); ctx.arc(sp.x,sp.y,r*2.4,0,Math.PI*2); ctx.fill();
+    // Ball surface
+    const ballGrd = ctx.createRadialGradient(sp.x-r*0.3,sp.y-r*0.35,r*0.05,sp.x,sp.y,r);
+    ballGrd.addColorStop(0,'#ffffff'); ballGrd.addColorStop(0.6,'#e2e8f0'); ballGrd.addColorStop(1,'#94a3b8');
+    ctx.fillStyle=ballGrd; ctx.beginPath(); ctx.arc(sp.x,sp.y,r,0,Math.PI*2); ctx.fill();
+    // Specular highlight
+    ctx.fillStyle='rgba(255,255,255,0.7)';
+    ctx.beginPath(); ctx.ellipse(sp.x-r*0.28,sp.y-r*0.3,r*0.22,r*0.15,-0.4,0,Math.PI*2); ctx.fill();
+
+    // Force vectors (replay phase)
+    if(bSt.phase==='replay' && bSt.vx!==undefined){
+      const vM = Math.hypot(bSt.vx, bSt.vy, bSt.vz) || 1;
+      const vp = proj([bSt.x + (bSt.vx/vM)*0.15, bSt.y + (bSt.vy/vM)*0.15, bSt.z + (bSt.vz/vM)*0.15], W, H);
+      if(vp){ ctx.strokeStyle='#facc15'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(sp.x,sp.y); ctx.lineTo(vp.x,vp.y); ctx.stroke(); }
+      
+      const omv = cross3([bSt.sx,bSt.sy,bSt.sz], [bSt.vx,bSt.vy,bSt.vz]);
+      const omvM = Math.hypot(omv[0], omv[1], omv[2]) || 1;
+      const mp = proj([bSt.x + (omv[0]/omvM)*0.15, bSt.y + (omv[1]/omvM)*0.15, bSt.z + (omv[2]/omvM)*0.15], W, H);
+      if(mp){ ctx.strokeStyle='#22d3ee'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(sp.x,sp.y); ctx.lineTo(mp.x,mp.y); ctx.stroke(); }
+    }
+  }
+}
+
+// 2D TOP VIEW TACTICAL BLACKBOARD MAP
+function draw2DMap(W, H, bSt){
+  topCtx.fillStyle='#0a1628'; topCtx.fillRect(0,0,W,H);
+
+  const PAD = 8;
+  const scaleX = (W - PAD*2) / (TBL_HW * 2.2);
+  const scaleY = (H - PAD*2) / (TBL_HL * 2.2);
+  const cX = W / 2;
+  const cY = H / 2;
+
+  function to2D(x, y){ return { x: cX + x*scaleX, y: cY - y*scaleY }; }
+
+  // Table filled rect
+  const t0=to2D(-TBL_HW,-TBL_HL), t1=to2D(TBL_HW,TBL_HL);
+  // Subtle grid inside table
+  topCtx.strokeStyle='rgba(56,189,248,0.07)'; topCtx.lineWidth=0.5;
+  for(let gi=-3;gi<=3;gi+=1){
+    const ga=to2D(gi*TBL_HW/3,-TBL_HL), gb=to2D(gi*TBL_HW/3,TBL_HL);
+    topCtx.beginPath(); topCtx.moveTo(ga.x,ga.y); topCtx.lineTo(gb.x,gb.y); topCtx.stroke();
+  }
+  topCtx.fillStyle='#162e5c'; topCtx.fillRect(t0.x, t1.y, t1.x-t0.x, t0.y-t1.y);
+  topCtx.strokeStyle='rgba(255,255,255,0.55)'; topCtx.lineWidth=1.5;
+  topCtx.strokeRect(t0.x, t1.y, t1.x-t0.x, t0.y-t1.y);
+
+  // Center longitudinal line
+  const cl1=to2D(0,-TBL_HL), cl2=to2D(0,TBL_HL);
+  topCtx.strokeStyle='rgba(255,255,255,0.2)'; topCtx.lineWidth=0.7;
+  topCtx.beginPath(); topCtx.moveTo(cl1.x,cl1.y); topCtx.lineTo(cl2.x,cl2.y); topCtx.stroke();
+
+  // NET line (center divider Y=0)
+  const nL=to2D(-TBL_HW,0), nR=to2D(TBL_HW,0);
+  topCtx.strokeStyle='rgba(56,189,248,0.8)'; topCtx.lineWidth=2;
+  topCtx.beginPath(); topCtx.moveTo(nL.x,nL.y); topCtx.lineTo(nR.x,nR.y); topCtx.stroke();
+  // Net label
+  topCtx.fillStyle='rgba(56,189,248,0.35)'; topCtx.font='6px JetBrains Mono, monospace';
+  topCtx.textAlign='center'; topCtx.fillText('NET', cX, nL.y-2);
+
+  // SERVING side label
+  topCtx.fillStyle='rgba(255,255,255,0.15)';
+  topCtx.fillText('SERVE', cX, t0.y-3);
+  topCtx.fillText('RCV', cX, t1.y+8);
+
+  // Full ballistic trajectory
+  if(G_res && G_res.traj.length > 1){
+    // Glow pass
+    topCtx.strokeStyle='rgba(56,189,248,0.25)'; topCtx.lineWidth=4; topCtx.beginPath();
+    G_res.traj.forEach((pt,i)=>{
+      const p=to2D(pt.x,pt.y);
+      if(i===0) topCtx.moveTo(p.x,p.y); else topCtx.lineTo(p.x,p.y);
+    });
+    topCtx.stroke();
+    // Sharp inner line
+    topCtx.strokeStyle='rgba(56,189,248,0.8)'; topCtx.lineWidth=1.5; topCtx.beginPath();
+    G_res.traj.forEach((pt,i)=>{
+      const p=to2D(pt.x,pt.y);
+      if(i===0) topCtx.moveTo(p.x,p.y); else topCtx.lineTo(p.x,p.y);
+    });
+    topCtx.stroke();
+
+    // Bounce cross-markers (ALL bounces)
+    G_res.bounces.forEach((b,bi)=>{
+      const p=to2D(b.pos.x,b.pos.y);
+      // Shockwave circle
+      topCtx.strokeStyle=bi===0?'rgba(251,146,60,0.6)':'rgba(52,211,153,0.6)';
+      topCtx.lineWidth=1;
+      topCtx.beginPath(); topCtx.arc(p.x,p.y,7,0,Math.PI*2); topCtx.stroke();
+      // Cross marker
+      topCtx.strokeStyle=bi===0?'#fb923c':'#34d399'; topCtx.lineWidth=1.5;
+      topCtx.beginPath();
+      topCtx.moveTo(p.x-5,p.y-5); topCtx.lineTo(p.x+5,p.y+5);
+      topCtx.moveTo(p.x+5,p.y-5); topCtx.lineTo(p.x-5,p.y+5);
+      topCtx.stroke();
+      // Bounce number
+      topCtx.fillStyle=bi===0?'#fb923c':'#34d399';
+      topCtx.font='bold 6px Inter, sans-serif'; topCtx.textAlign='center';
+      topCtx.fillText(bi+1, p.x, p.y-7);
+    });
+  }
+
+  // Live ball dot with velocity arrow
+  const pBall=to2D(bSt.x,bSt.y);
+  // Glow
+  topCtx.fillStyle='rgba(255,255,255,0.2)';
+  topCtx.beginPath(); topCtx.arc(pBall.x,pBall.y,7,0,Math.PI*2); topCtx.fill();
+  // Ball
+  topCtx.fillStyle='#ffffff'; topCtx.strokeStyle='#38bdf8'; topCtx.lineWidth=1.5;
+  topCtx.beginPath(); topCtx.arc(pBall.x,pBall.y,4,0,Math.PI*2); topCtx.fill(); topCtx.stroke();
+  // Velocity arrow
+  if(bSt.vx!==undefined&&bSt.vy!==undefined){
+    const vScale=1.2;
+    const vEnd=to2D(bSt.x+bSt.vx*vScale*0.01, bSt.y+bSt.vy*vScale*0.01);
+    const adx=vEnd.x-pBall.x, ady=vEnd.y-pBall.y;
+    const alen=Math.sqrt(adx*adx+ady*ady);
+    if(alen>3){
+      topCtx.strokeStyle='rgba(250,204,21,0.8)'; topCtx.lineWidth=1.2;
+      topCtx.beginPath(); topCtx.moveTo(pBall.x,pBall.y); topCtx.lineTo(vEnd.x,vEnd.y); topCtx.stroke();
+    }
+  }
+}
+
+// MANAGEMENT COMMANDS
+function generateServe(){
+  document.getElementById('placeholderOverlay').classList.add('hidden');
+  document.getElementById('topViewContainer').classList.remove('hidden');
+  document.getElementById('coachPanel').classList.remove('hidden');
+  document.getElementById('coachPanel').classList.add('flex');
+  document.getElementById('coachAnalysis').classList.add('hidden');
+  document.getElementById('outcomeBadge').classList.add('hidden');
+  document.getElementById('genBtn').disabled = true;
+  
+  resizeCanvas(); buildCam(); updateCameraPosition();
+  calculateCurrentServe();
+  
+  const loader = document.getElementById('loaderOverlay');
+  const bar = document.getElementById('loaderBar');
+  loader.classList.remove('hidden'); loader.classList.add('flex');
+  bar.style.transition = 'none'; bar.style.width = '0%';
+  
+  setTimeout(()=>{ bar.style.transition = 'width 0.35s'; bar.style.width = '100%'; }, 50);
+  setTimeout(()=>{
+    loader.classList.add('hidden'); loader.classList.remove('flex');
+    document.getElementById('genBtn').disabled = false;
+    startPlayback();
+  }, 400);
+}
+
+function startPlayback(){
+  animState.masterTime = 0; animState.playing = true; animState.wallStart = null; animState.trail = []; animState.bounceEffects = [];
+  document.getElementById('playIcon').classList.add('hidden'); document.getElementById('pauseIcon').classList.remove('hidden');
+  cancelAnimationFrame(animState.rafId);
+  animState.rafId = requestAnimationFrame(playTick);
+}
+
+function playTick(ts){
+  if(!animState.playing) return;
+  if(!animState.wallStart) animState.wallStart = ts;
+  let elapsed = (ts - animState.wallStart) / 1000;
+  animState.masterTime = Math.min(elapsed, 10.0);
+  
+  renderFrame(animState.masterTime);
+  updateUI(animState.masterTime);
+
+  if(animState.masterTime >= 10.0){
+    animState.playing = false;
+    document.getElementById('playIcon').classList.remove('hidden'); document.getElementById('pauseIcon').classList.add('hidden');
+    return;
+  }
+  animState.rafId = requestAnimationFrame(playTick);
+}
+
+function updateUI(t){
+  const pct = (t / 10.0) * 100;
+  document.getElementById('timelineFill').style.width = pct+'%';
+  document.getElementById('timelineThumb').style.left = pct+'%';
+  document.getElementById('timeDisplay').textContent = t.toFixed(1)+'s';
+  
+  const bSt = getBallStateAtTime(t);
+  if(!bSt) return;
+
+  document.getElementById('rt-height').textContent = bSt.z.toFixed(2)+' м';
+  document.getElementById('rt-speed').textContent = bSt.spd.toFixed(1)+' м/с';
+  document.getElementById('rt-magnus').textContent = bSt.mg ? bSt.mg.toFixed(2)+' м/с²' : '0.00 м/с²';
+
+  const sc = document.getElementById('coachStatusCard');
+  const tw = document.getElementById('telemWidget');
+  const st = document.getElementById('coachStatusTitle');
+  const sd = document.getElementById('coachStatusDesc');
+  const ca = document.getElementById('coachAnalysis');
+  const badge = document.getElementById('outcomeBadge');
+
+  if(bSt.phase === 'focus'){
+    sc.className = 'rounded-2xl p-4 border transition-all duration-500 telem-idle'; sc.style.background='rgba(255,255,255,0.03)';
+    tw.className = 'rounded-2xl p-4 border transition-all duration-500 telem-idle'; tw.style.background='rgba(255,255,255,0.02)';
+    st.textContent = 'Подготовка (0-2с)'; sd.textContent = 'Мяч зафиксирован на открытой ладони перед подбросом.';
+    ca.classList.add('hidden'); badge.classList.add('hidden');
+  } else if(bSt.phase === 'toss'){
+    sc.className = 'rounded-2xl p-4 border transition-all duration-500'; sc.style.background='rgba(120,53,15,0.15)'; sc.style.borderColor='rgba(245,158,11,0.3)';
+    tw.className = 'rounded-2xl p-4 border transition-all duration-500 telem-idle'; tw.style.background='rgba(255,255,255,0.02)';
+    st.textContent = 'Вертикальный подброс'; sd.textContent = `Мяч подлетел вверх на высоту ${P.tossHeight}м по регламенту ITTF.`;
+  } else if(bSt.phase === 'flight'){
+    if(G_res.outcome === 'hit'){
+      sc.className = 'rounded-2xl p-4 border transition-all duration-500'; sc.style.background='rgba(6,78,59,0.2)'; sc.style.borderColor='rgba(34,197,94,0.3)';
+      tw.className = 'rounded-2xl p-4 border transition-all duration-500 telem-hit'; tw.style.background='rgba(6,78,59,0.08)';
+      st.textContent = 'Полет (Видеоролик)'; sd.textContent = 'Мяч в игре. Баллистика рассчитывается динамически в 60 FPS.';
+    } else {
+      sc.className = 'rounded-2xl p-4 border transition-all duration-500'; sc.style.background='rgba(127,29,29,0.2)'; sc.style.borderColor='rgba(239,68,68,0.3)';
+      tw.className = 'rounded-2xl p-4 border transition-all duration-500 telem-fault'; tw.style.background='rgba(127,29,29,0.08)';
+      st.textContent = 'Полет (Ошибка!)'; sd.textContent = G_res.faultReason;
+      badge.textContent = G_res.faultReason;
+      badge.className = 'absolute top-4 right-4 px-4 py-2.5 rounded-2xl font-black text-sm border backdrop-blur-sm z-40 bg-red-500/20 text-red-300 border-red-500/40';
+      badge.classList.remove('hidden');
+    }
+  } else if(bSt.phase === 'replay'){
+    ca.classList.remove('hidden');
+    if(G_res.outcome === 'hit'){
+      sc.className = 'rounded-2xl p-4 border transition-all duration-500'; sc.style.background='rgba(6,78,59,0.2)'; sc.style.borderColor='rgba(34,197,94,0.4)';
+      tw.className = 'rounded-2xl p-4 border transition-all duration-500 telem-hit'; tw.style.background='rgba(6,78,59,0.08)';
+      badge.textContent = 'ПОДАЧА В СТОЛ ✅';
+      badge.className = 'absolute top-4 right-4 px-4 py-2.5 rounded-2xl font-black text-sm border backdrop-blur-sm z-40 bg-emerald-500/20 text-emerald-300 border-emerald-500/40';
+      badge.classList.remove('hidden');
+    } else {
+      tw.className = 'rounded-2xl p-4 border transition-all duration-500 telem-fault'; tw.style.background='rgba(127,29,29,0.08)';
+    }
+    document.getElementById('coachAnalysisText').textContent = G_res.sCfg.desc + (G_res.outcome === 'hit' ? ' Первый отскок лег идеально, геометрия сетки пройдена чисто.' : ' Настройте углы вылета или уменьшите резкость кисти, чтобы погасить аут.');
+  }
+}
+
+function togglePlayPause(){
+  if(!G_res) return;
+  if(animState.masterTime >= 10.0) { replayVideo(); return; }
+  animState.playing = !animState.playing;
+  
+  if(animState.playing){
+    const resume = animState.masterTime;
+    animState.wallStart = null;
+    requestAnimationFrame(ts => {
+      animState.wallStart = ts - resume*1000;
+      animState.rafId = requestAnimationFrame(playTick);
+    });
+  } else { cancelAnimationFrame(animState.rafId); }
+  document.getElementById('playIcon').classList.toggle('hidden', animState.playing);
+  document.getElementById('pauseIcon').classList.toggle('hidden', !animState.playing);
+}
+
+function replayVideo(){
+  if(!G_res) return;
+  cancelAnimationFrame(animState.rafId);
+  document.getElementById('outcomeBadge').classList.add('hidden');
+  startPlayback();
+}
+
+function seekToClick(e){
+  if(!G_res) return;
+  const rect = e.currentTarget.getBoundingClientRect();
+  const frac = Math.max(0, Math.min(1, (e.clientX - rect.left)/rect.width));
+  const t = frac * 10.0;
+  
+  animState.masterTime = t;
+  if(animState.playing){
+    cancelAnimationFrame(animState.rafId);
+    requestAnimationFrame(ts => {
+      animState.wallStart = ts - t*1000;
+      animState.rafId = requestAnimationFrame(playTick);
+    });
+  } else { renderStill(); updateUI(t); }
+}
+
+window.addEventListener('load', ()=>{
+  Object.keys(SCFG).forEach(id => onParam(id, P[id]));
+  setHand('right'); setServe('pendulum');
+  resizeCanvas(); buildCam(); updateCameraPosition(); renderStill();
+});
+</script>
+</body>
+</html>
