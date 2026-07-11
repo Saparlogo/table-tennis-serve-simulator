@@ -9,30 +9,29 @@
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800;900&family=JetBrains+Mono:wght@400;700&display=swap');
     
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background-color: #020817; color: #f1f5f9; overflow: hidden; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background-color: #0b0e14; color: #f1f5f9; overflow: hidden; margin: 0; padding: 0; }
     
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: rgba(56,189,248,0.2); border-radius: 999px; }
-    ::-webkit-scrollbar-thumb:hover { background: rgba(56,189,248,0.4); }
+    ::-webkit-scrollbar-thumb { background: rgba(34,211,238,0.2); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(34,211,238,0.4); }
 
     /* ── Sliders ── */
     .slider-wrap { position: relative; width: 100%; display: flex; align-items: center; height: 20px; }
-    .slider-bg { position: absolute; inset: 0; background: rgba(255,255,255,0.04); border-radius: 999px; overflow: hidden; border: 1px solid rgba(255,255,255,0.06); }
-    .slider-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; transition: width 0.08s ease; }
+    .slider-bg { position: absolute; inset: 0; background: #1a1f2e; border-radius: 999px; overflow: hidden; border: 1px solid #23283b; }
+    .slider-fill { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 999px; background: #ccff00; transition: width 0.08s ease; box-shadow: 0 0 10px rgba(204,255,0,0.2); }
     input[type=range] { -webkit-appearance: none; width: 100%; height: 100%; opacity: 0; cursor: pointer; position: relative; z-index: 2; }
-    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 18px; height: 18px; background: #fff; border-radius: 50%; box-shadow: 0 0 0 2px rgba(56,189,248,0.6), 0 0 14px rgba(56,189,248,0.35); }
+    input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; background: #fff; border-radius: 50%; box-shadow: 0 0 0 2px #ccff00, 0 0 12px rgba(204,255,0,0.4); }
     .ctrl-group:has(input:active) .slider-bg,
-    .ctrl-group:has(input:focus) .slider-bg { box-shadow: 0 0 0 2px rgba(56,189,248,0.15); }
+    .ctrl-group:has(input:focus) .slider-bg { border-color: rgba(204,255,0,0.4); box-shadow: 0 0 0 2px rgba(204,255,0,0.1); }
 
     /* ── Buttons ── */
-    .ctrl-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,0.07); transition: all 0.18s; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
-    .ctrl-btn:hover { background: rgba(56,189,248,0.15); border-color: rgba(56,189,248,0.4); box-shadow: 0 0 12px rgba(56,189,248,0.2); transform: scale(1.06); }
-    .val-pill { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.72rem; padding: 2px 9px; border-radius: 999px; border: 1px solid transparent; }
+    .ctrl-btn { display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: #131722; transition: all 0.18s; cursor: pointer; border: 1px solid #23283b; }
+    .ctrl-btn:hover { background: #1a1f2e; border-color: #ccff00; box-shadow: 0 0 12px rgba(204,255,0,0.15); transform: scale(1.06); }
+    .val-pill { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.72rem; padding: 2px 8px; border-radius: 6px; border: 1px solid #23283b; background: rgba(255,255,255,0.02); color: #fff; }
     
-    .generate-btn { background: linear-gradient(135deg, #1d4ed8 0%, #0891b2 100%); transition: all 0.22s; position: relative; overflow: hidden; border: 1px solid rgba(56,189,248,0.3); }
-    .generate-btn::before { content:''; position:absolute; inset:0; background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 60%); }
-    .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -6px rgba(37,99,235,0.55), 0 0 0 1px rgba(56,189,248,0.3); }
+    .generate-btn { background: #ccff00; color: #0b0e14; transition: all 0.22s; position: relative; overflow: hidden; border: none; font-weight: 900; }
+    .generate-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 30px -6px rgba(204,255,0,0.4); background: #d9ff33; }
     .generate-btn:active { transform: translateY(1px); }
     .generate-btn:disabled { opacity: 0.45; pointer-events: none; }
     
@@ -41,14 +40,14 @@
     #mainCanvas:active { cursor: grabbing; }
     
     /* ── Tab buttons ── */
-    .tab-btn { padding: 6px 12px; border-radius: 9px; font-size: 0.73rem; font-weight: 600; cursor: pointer; transition: all 0.18s; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); color: #64748b; }
-    .tab-btn.active { background: rgba(56,189,248,0.12); border-color: rgba(56,189,248,0.35); color: #38bdf8; box-shadow: 0 0 10px rgba(56,189,248,0.12); }
-    .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.08); color: #94a3b8; }
+    .tab-btn { padding: 8px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; transition: all 0.18s; background: transparent; border: 1px solid #23283b; color: #64748b; }
+    .tab-btn.active { background: rgba(34,211,238,0.1); border-color: #22d3ee; color: #22d3ee; box-shadow: inset 0 0 12px rgba(34,211,238,0.05); }
+    .tab-btn:hover:not(.active) { background: rgba(255,255,255,0.03); color: #e2e8f0; }
 
     /* ── Telemetry widget glow states ── */
-    .telem-hit  { border-color: rgba(34,197,94,0.4)  !important; box-shadow: 0 0 20px rgba(34,197,94,0.12); }
-    .telem-fault{ border-color: rgba(239,68,68,0.4)   !important; box-shadow: 0 0 20px rgba(239,68,68,0.12); }
-    .telem-idle { border-color: rgba(255,255,255,0.06) !important; box-shadow: none; }
+    .telem-hit  { border-color: rgba(34,197,94,0.4) !important; box-shadow: 0 0 20px rgba(34,197,94,0.08); }
+    .telem-fault{ border-color: rgba(239,68,68,0.4) !important; box-shadow: 0 0 20px rgba(239,68,68,0.08); }
+    .telem-idle { border-color: rgba(255,255,255,0.05) !important; box-shadow: none; }
 
     /* ── Animations ── */
     @keyframes badge-pulse { 0%,100%{opacity:1;transform:scale(1)}50%{opacity:.82;transform:scale(.97)} }
@@ -56,27 +55,27 @@
     .neon-label { animation: neon-flicker 4s ease-in-out infinite; }
     
     /* ── Divider ── */
-    .panel-divider { height: 1px; background: linear-gradient(90deg, transparent, rgba(56,189,248,0.15), transparent); margin: 0 -1.25rem; }
+    .panel-divider { height: 1px; background: #23283b; margin: 0 -1.25rem; }
   </style>
 </head>
-<body class="h-screen flex flex-col text-sm select-none">
+<body class="h-screen flex flex-col text-sm select-none bg-[#0b0e14]">
 
-<header class="flex-shrink-0 h-14 border-b border-white/8 flex items-center justify-between px-6 z-20 relative" style="background: rgba(2,8,23,0.92); backdrop-filter: blur(24px); border-bottom-color: rgba(56,189,248,0.12);">
+<header class="flex-shrink-0 h-16 border-b flex items-center justify-between px-6 z-20 relative bg-[#131722] border-[#23283b]">
   <div class="flex items-center gap-3">
-    <div class="relative w-9 h-9 rounded-xl flex items-center justify-center" style="background: linear-gradient(135deg,#1d4ed8,#0891b2); box-shadow: 0 0 18px rgba(56,189,248,0.35), 0 0 4px rgba(56,189,248,0.6) inset;">
-      <span class="text-white font-black text-lg leading-none neon-label">S</span>
+    <div class="relative w-9 h-9 rounded-lg flex items-center justify-center bg-[#ccff00] shadow-[0_0_15px_rgba(204,255,0,0.3)]">
+      <span class="text-[#0b0e14] font-black text-lg leading-none neon-label">S</span>
     </div>
     <div>
-      <h1 class="font-black tracking-tight text-white leading-none text-base">Serve Simulator <span style="color:#38bdf8; text-shadow:0 0 14px rgba(56,189,248,0.6)">PRO</span></h1>
-      <p class="text-[9px] font-bold uppercase tracking-[0.2em] mt-0.5" style="color:rgba(56,189,248,0.5)">Hawk-Eye · Tactical Ballistics Lab · v3.0</p>
+      <h1 class="font-black tracking-tight text-white leading-none text-base">Serve Simulator <span class="text-[#22d3ee]">PRO</span></h1>
+      <p class="text-[10px] uppercase tracking-widest text-slate-400 mt-0.5">Hawk-Eye · Tactical Ballistics Lab</p>
     </div>
   </div>
-  <div class="flex items-center gap-3">
-    <div class="flex items-center gap-1.5 text-[10px] font-mono" style="color:rgba(56,189,248,0.6)">
-      <div class="w-1.5 h-1.5 rounded-full bg-cyan-400" style="box-shadow:0 0 6px #22d3ee; animation:badge-pulse 1.5s ease infinite"></div>
-      LIVE SIMULATION
+  <div class="flex items-center gap-4">
+    <div class="flex items-center gap-2 text-[10px] font-bold tracking-widest uppercase text-[#22d3ee]">
+      <div class="w-1.5 h-1.5 rounded-full bg-[#22d3ee] shadow-[0_0_8px_#22d3ee] animate-pulse"></div>
+      Live Simulation
     </div>
-    <div class="text-[10px] font-mono px-3 py-1.5 rounded-lg border" style="color:#64748b; background:rgba(255,255,255,0.03); border-color:rgba(255,255,255,0.07)">
+    <div class="text-[10px] font-mono px-3 py-1.5 rounded-md border border-[#23283b] bg-[#1a1f2e] text-slate-400">
       🖱️ ЛКМ — орбита · Колесо — зум
     </div>
   </div>
@@ -84,132 +83,128 @@
 
 <div class="flex-1 flex overflow-hidden">
   
-  <aside class="flex-shrink-0 w-80 flex flex-col overflow-y-auto" style="background:rgba(2,8,23,0.7); backdrop-filter:blur(28px); border-right:1px solid rgba(255,255,255,0.06);">
-    <div class="p-5 space-y-5 flex-1">
+  <aside class="flex-shrink-0 w-80 flex flex-col overflow-y-auto bg-[#131722] border-r border-[#23283b] hidden lg:flex">
+    <div class="p-6 space-y-6 flex-1">
 
       <div>
-        <p class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3" style="color:rgba(56,189,248,0.5)">👋 Ведущая рука</p>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-3">Ведущая рука</p>
         <div class="flex gap-2">
-          <button id="hand-left" onclick="setHand('left')" class="flex-1 tab-btn py-2.5 text-sm">Левая</button>
-          <button id="hand-right" onclick="setHand('right')" class="flex-1 tab-btn py-2.5 text-sm active">Правая</button>
+          <button id="hand-left" onclick="setHand('left')" class="flex-1 tab-btn py-2 text-sm">Левая</button>
+          <button id="hand-right" onclick="setHand('right')" class="flex-1 tab-btn py-2 text-sm active">Правая</button>
         </div>
       </div>
 
       <div>
-        <p class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3" style="color:rgba(56,189,248,0.5)">🏓 Тип подачи</p>
-        <div class="grid grid-cols-2 gap-1.5">
-          <button id="serve-pendulum" onclick="setServe('pendulum')" class="tab-btn active">⏱ Маятник</button>
-          <button id="serve-reverse" onclick="setServe('reverse')" class="tab-btn">🔄 Обр. маятник</button>
-          <button id="serve-tomahawk" onclick="setServe('tomahawk')" class="tab-btn">🪓 Томагавк</button>
-          <button id="serve-ghost" onclick="setServe('ghost')" class="tab-btn">👻 Призрак</button>
-          <button id="serve-high" onclick="setServe('high')" class="tab-btn col-span-2">🚀 Высокий подброс</button>
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-3">Тип подачи</p>
+        <div class="grid grid-cols-2 gap-2">
+          <button id="serve-pendulum" onclick="setServe('pendulum')" class="tab-btn active">Маятник</button>
+          <button id="serve-reverse" onclick="setServe('reverse')" class="tab-btn">Обр. маятник</button>
+          <button id="serve-tomahawk" onclick="setServe('tomahawk')" class="tab-btn">Томагавк</button>
+          <button id="serve-ghost" onclick="setServe('ghost')" class="tab-btn">Призрак</button>
+          <button id="serve-high" onclick="setServe('high')" class="tab-btn col-span-2">Высокий подброс</button>
         </div>
       </div>
 
       <div class="panel-divider"></div>
 
-      <div class="space-y-4">
-        <p class="text-[9px] font-bold uppercase tracking-[0.2em]" style="color:rgba(56,189,248,0.5)">⚙️ Кастомизация подачи</p>
+      <div class="space-y-5">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">Кастомизация подачи</p>
 
-        <div class="ctrl-group space-y-1.5">
+        <div class="ctrl-group space-y-2">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-medium" style="color:#94a3b8">Высота подброса</label>
-            <span id="lbl-tossHeight" class="val-pill" style="background:rgba(56,189,248,0.08);color:#38bdf8;border-color:rgba(56,189,248,0.25)">0.5 <span style="opacity:.5">м</span></span>
+            <label class="text-xs font-medium text-slate-300">Высота подброса</label>
+            <span id="lbl-tossHeight" class="val-pill">0.5 <span class="opacity-50 font-normal">м</span></span>
           </div>
           <div class="slider-wrap">
             <div class="slider-bg"></div>
-            <div id="fill-tossHeight" class="slider-fill" style="background:linear-gradient(90deg,#1d4ed8,#38bdf8);box-shadow:0 0 8px rgba(56,189,248,0.3)"></div>
-            <input type="range" id="sl-tossHeight" min="0.16" max="3.0" step="0.05" value="0.5" style="z-index:2;background:transparent" oninput="onParam('tossHeight',+this.value)">
+            <div id="fill-tossHeight" class="slider-fill"></div>
+            <input type="range" id="sl-tossHeight" min="0.16" max="3.0" step="0.05" value="0.5" oninput="onParam('tossHeight',+this.value)">
           </div>
         </div>
 
-        <div class="ctrl-group space-y-1.5">
+        <div class="ctrl-group space-y-2">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-medium" style="color:#94a3b8">Точка удара (от стола)</label>
-            <span id="lbl-impactHeight" class="val-pill" style="background:rgba(20,184,166,0.08);color:#2dd4bf;border-color:rgba(20,184,166,0.25)">0.2 <span style="opacity:.5">м</span></span>
+            <label class="text-xs font-medium text-slate-300">Точка удара (от стола)</label>
+            <span id="lbl-impactHeight" class="val-pill">0.2 <span class="opacity-50 font-normal">м</span></span>
           </div>
           <div class="slider-wrap">
             <div class="slider-bg"></div>
-            <div id="fill-impactHeight" class="slider-fill" style="background:linear-gradient(90deg,#0f766e,#2dd4bf);box-shadow:0 0 8px rgba(20,184,166,0.3)"></div>
-            <input type="range" id="sl-impactHeight" min="0.05" max="0.5" step="0.01" value="0.2" style="z-index:2;background:transparent" oninput="onParam('impactHeight',+this.value)">
+            <div id="fill-impactHeight" class="slider-fill"></div>
+            <input type="range" id="sl-impactHeight" min="0.05" max="0.5" step="0.01" value="0.2" oninput="onParam('impactHeight',+this.value)">
           </div>
         </div>
 
-        <div class="ctrl-group space-y-1.5">
+        <div class="ctrl-group space-y-2">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-medium" style="color:#94a3b8">Резкость кисти (Вращение)</label>
-            <span id="lbl-wristSnap" class="val-pill" style="background:rgba(249,115,22,0.08);color:#fb923c;border-color:rgba(249,115,22,0.25)">100 <span style="opacity:.5">%</span></span>
+            <label class="text-xs font-medium text-slate-300">Резкость кисти (Вращение)</label>
+            <span id="lbl-wristSnap" class="val-pill">100 <span class="opacity-50 font-normal">%</span></span>
           </div>
           <div class="slider-wrap">
             <div class="slider-bg"></div>
-            <div id="fill-wristSnap" class="slider-fill" style="background:linear-gradient(90deg,#c2410c,#fb923c);box-shadow:0 0 8px rgba(249,115,22,0.3)"></div>
-            <input type="range" id="sl-wristSnap" min="20" max="180" step="5" value="100" style="z-index:2;background:transparent" oninput="onParam('wristSnap',+this.value)">
+            <div id="fill-wristSnap" class="slider-fill"></div>
+            <input type="range" id="sl-wristSnap" min="20" max="180" step="5" value="100" oninput="onParam('wristSnap',+this.value)">
           </div>
         </div>
 
-        <div class="ctrl-group space-y-1.5">
+        <div class="ctrl-group space-y-2">
           <div class="flex justify-between items-center">
-            <label class="text-xs font-medium" style="color:#94a3b8">Коррекция скорости</label>
-            <span id="lbl-speedMod" class="val-pill" style="background:rgba(168,85,247,0.08);color:#c084fc;border-color:rgba(168,85,247,0.25)">0.0 <span style="opacity:.5">м/с</span></span>
+            <label class="text-xs font-medium text-slate-300">Коррекция скорости</label>
+            <span id="lbl-speedMod" class="val-pill">0.0 <span class="opacity-50 font-normal">м/с</span></span>
           </div>
           <div class="slider-wrap">
             <div class="slider-bg"></div>
-            <div id="fill-speedMod" class="slider-fill" style="background:linear-gradient(90deg,#7e22ce,#c084fc);box-shadow:0 0 8px rgba(168,85,247,0.3)"></div>
-            <input type="range" id="sl-speedMod" min="-2.0" max="3.0" step="0.1" value="0.0" style="z-index:2;background:transparent" oninput="onParam('speedMod',+this.value)">
+            <div id="fill-speedMod" class="slider-fill"></div>
+            <input type="range" id="sl-speedMod" min="-2.0" max="3.0" step="0.1" value="0.0" oninput="onParam('speedMod',+this.value)">
           </div>
         </div>
       </div>
 
     </div>
 
-    <div class="px-5 pb-5 flex-shrink-0">
-      <button id="genBtn" onclick="generateServe()" class="generate-btn w-full py-4 rounded-2xl font-black text-sm text-white tracking-widest uppercase shadow-2xl select-none">
-        🎬 Сгенерировать видео подачи
+    <div class="p-6 pt-0 flex-shrink-0">
+      <button id="genBtn" onclick="generateServe()" class="generate-btn w-full py-3.5 rounded-lg text-[11px] tracking-[0.15em] uppercase shadow-[0_0_15px_rgba(204,255,0,0.2)]">
+        Сгенерировать подачу
       </button>
     </div>
   </aside>
 
-  <main class="flex-1 min-w-0 flex flex-col relative bg-black">
+  <main class="flex-1 min-w-0 flex flex-col relative bg-[#0b0e14]">
     <div id="canvasContainer" class="flex-1 relative overflow-hidden min-h-0 w-full h-full">
       <canvas id="mainCanvas" class="absolute inset-0"></canvas>
 
-      <div id="topViewContainer" class="absolute top-4 left-4 w-44 h-64 bg-slate-950/85 backdrop-blur-md border border-white/10 rounded-2xl p-2.5 z-30 flex flex-col shadow-2xl hidden">
-        <p class="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1.5 text-center">Вид сверху (2D Доска)</p>
-        <canvas id="topCanvas" class="w-full flex-1 bg-slate-900/40 rounded-xl border border-white/5"></canvas>
+      <div id="topViewContainer" class="absolute top-4 left-4 w-44 h-64 bg-[#131722]/80 backdrop-blur-md border border-[#23283b] rounded-xl p-3 z-30 flex flex-col shadow-2xl hidden">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-2 text-center">Вид сверху</p>
+        <canvas id="topCanvas" class="w-full flex-1 bg-[#0b0e14]/50 rounded-lg border border-[#23283b]"></canvas>
       </div>
 
-      <div id="placeholderOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-950 select-none z-10">
-        <div class="text-7xl mb-6 opacity-20">🏓</div>
-        <p class="text-2xl font-black text-white/20 mb-2">Serve Video Simulator</p>
-        <p class="text-sm text-slate-600">Выберите тип подачи и запустите рендеринг видео</p>
+      <div id="placeholderOverlay" class="absolute inset-0 flex flex-col items-center justify-center bg-[#0b0e14] select-none z-10">
+        <div class="text-7xl mb-6 opacity-10">🏓</div>
+        <p class="text-xl font-bold text-slate-500 mb-2 tracking-wide">Serve Video Simulator</p>
+        <p class="text-sm text-slate-600">Настройте параметры и запустите рендеринг</p>
       </div>
 
-      <div id="loaderOverlay" class="absolute inset-0 bg-gray-950/95 backdrop-blur-sm hidden flex flex-col items-center justify-center z-20 select-none">
+      <div id="loaderOverlay" class="absolute inset-0 bg-[#0b0e14]/90 backdrop-blur-sm hidden flex flex-col items-center justify-center z-20 select-none">
         <div class="w-80 text-center">
           <div class="text-4xl mb-4 animate-bounce">🎬</div>
-          <p class="text-xl font-bold text-white mb-2">Рендеринг траектории...</p>
-          <div class="h-1.5 bg-slate-800 rounded-full mx-8">
-            <div id="loaderBar" class="h-full bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full" style="width:0%"></div>
+          <p class="text-sm font-bold text-white mb-3 uppercase tracking-widest">Рендеринг траектории...</p>
+          <div class="h-1.5 bg-[#1a1f2e] rounded-full mx-8 overflow-hidden">
+            <div id="loaderBar" class="h-full bg-[#ccff00]" style="width:0%"></div>
           </div>
         </div>
       </div>
 
-      <div id="outcomeBadge" class="absolute top-4 right-4 hidden px-4 py-2.5 rounded-2xl font-black text-base border backdrop-blur-sm z-10" style="animation:badge-pulse 1.2s ease-in-out infinite"></div>
+      <div id="outcomeBadge" class="absolute top-4 right-4 hidden px-4 py-2 rounded-lg font-bold text-sm tracking-wider uppercase border bg-[#131722]/90 backdrop-blur-sm z-10" style="animation:badge-pulse 1.2s ease-in-out infinite"></div>
     </div>
 
-    <div id="playerBar" class="flex-shrink-0 bg-black/90 backdrop-blur border-t border-white/5 px-4 py-3 space-y-2.5 w-full">
-      <div class="flex items-center gap-3">
-        <span id="timeDisplay" class="text-xs font-mono text-slate-500 w-14 text-right flex-shrink-0">0.0s</span>
-        <div class="flex-1 relative h-4 flex items-center cursor-pointer" onclick="seekToClick(event)">
-          <div class="absolute inset-x-0 h-1 bg-slate-800 rounded-full"></div>
-          <div class="absolute h-1 bg-slate-700/50 rounded-l-full" style="left:0%; width:20%;"></div>
-          <div class="absolute h-1 bg-slate-600/50" style="left:20%; width:20%;"></div>
-          <div class="absolute h-1 bg-blue-900/50" style="left:40%; width:20%;"></div>
-          <div class="absolute h-1 bg-purple-900/50 rounded-r-full" style="left:60%; width:40%;"></div>
-          <div id="timelineFill" class="absolute left-0 h-1 bg-gradient-to-r from-blue-600 to-cyan-400 rounded-full pointer-events-none" style="width:0%"></div>
-          <div id="timelineThumb" class="absolute w-3.5 h-3.5 rounded-full bg-white shadow-lg pointer-events-none border-2 border-blue-400" style="left:0%; transform:translate(-50%,0)"></div>
+    <div id="playerBar" class="flex-shrink-0 bg-[#131722] border-t border-[#23283b] px-5 py-3.5 space-y-3 w-full">
+      <div class="flex items-center gap-4">
+        <span id="timeDisplay" class="text-xs font-mono text-slate-400 w-12 text-right flex-shrink-0">0.0s</span>
+        <div class="flex-1 relative h-2.5 flex items-center cursor-pointer group" onclick="seekToClick(event)">
+          <div class="absolute inset-x-0 h-1 bg-[#1a1f2e] rounded-full group-hover:h-1.5 transition-all"></div>
+          <div id="timelineFill" class="absolute left-0 h-1 bg-[#22d3ee] rounded-full pointer-events-none group-hover:h-1.5 transition-all" style="width:0%"></div>
+          <div id="timelineThumb" class="absolute w-3 h-3 rounded-full bg-white shadow-[0_0_8px_rgba(34,211,238,0.5)] pointer-events-none" style="left:0%; transform:translate(-50%,0)"></div>
         </div>
-        <span id="durationDisplay" class="text-xs font-mono text-slate-600 w-14 flex-shrink-0">10.0s</span>
+        <span id="durationDisplay" class="text-xs font-mono text-slate-500 w-12 flex-shrink-0">10.0s</span>
       </div>
 
       <div class="flex items-center justify-between">
@@ -222,49 +217,49 @@
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="w-4 h-4 text-white"><path d="M1 4v6h6"/><path d="M3.51 15a9 9 0 1 0 .49-3.5"/></svg>
           </button>
         </div>
-        <div class="text-[11px] text-slate-500 font-mono flex items-center gap-3">
-          <span class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-slate-500"></div> 0-2с: Стойка</span>
-          <span class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div> 2-4с: Подброс</span>
-          <span class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-blue-500"></div> 4-6с: Полет</span>
-          <span class="flex items-center gap-1"><div class="w-1.5 h-1.5 rounded-full bg-purple-500"></div> 6-10с: Анализ сил</span>
+        <div class="text-[10px] uppercase tracking-wider text-slate-500 flex items-center gap-4 hidden lg:flex">
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-600"></div> Стойка</span>
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-slate-400"></div> Подброс</span>
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-[#22d3ee]"></div> Полет</span>
+          <span class="flex items-center gap-1.5"><div class="w-1.5 h-1.5 rounded-full bg-[#a855f7]"></div> Анализ</span>
         </div>
       </div>
     </div>
   </main>
 
-  <aside class="flex-shrink-0 w-72 flex flex-col overflow-y-auto" style="background:rgba(2,8,23,0.65); backdrop-filter:blur(28px); border-left:1px solid rgba(255,255,255,0.06);">
+  <aside class="flex-shrink-0 w-72 flex flex-col overflow-y-auto bg-[#131722] border-l border-[#23283b] hidden lg:flex">
     <div id="coachPanel" class="hidden flex-1 flex-col">
-      <div class="px-4 pt-4 pb-3" style="border-bottom:1px solid rgba(56,189,248,0.1)">
-        <p class="text-[9px] font-bold uppercase tracking-[0.2em]" style="color:rgba(56,189,248,0.55)">📊 Мониторинг · Hawk-Eye</p>
+      <div class="px-5 pt-5 pb-4 border-b border-[#23283b]">
+        <p class="text-[10px] uppercase tracking-widest text-slate-400">Мониторинг · Hawk-Eye</p>
       </div>
-      <div class="px-4 py-4 space-y-3 flex-1">
+      <div class="p-5 space-y-4 flex-1">
 
-        <div id="coachStatusCard" class="rounded-2xl p-4 border transition-all duration-500 telem-idle" style="background:rgba(255,255,255,0.03)">
-          <p id="coachStatusTitle" class="font-black text-sm text-white leading-tight">Ожидание...</p>
-          <p id="coachStatusDesc" class="text-[11px] mt-1" style="color:#64748b"></p>
+        <div id="coachStatusCard" class="rounded-xl p-4 border border-white/5 bg-white/5 backdrop-blur-sm transition-all duration-500 telem-idle">
+          <p id="coachStatusTitle" class="font-bold text-sm text-white leading-tight">Ожидание...</p>
+          <p id="coachStatusDesc" class="text-xs mt-1.5 text-slate-400"></p>
         </div>
 
-        <div id="telemWidget" class="rounded-2xl p-4 border transition-all duration-500 telem-idle" style="background:rgba(255,255,255,0.02)">
-          <p class="text-[9px] font-bold uppercase tracking-[0.2em] mb-3" style="color:rgba(56,189,248,0.5)">📡 Телеметрия реального времени</p>
-          <div class="space-y-2.5">
+        <div id="telemWidget" class="rounded-xl p-4 border border-white/5 bg-white/5 backdrop-blur-sm transition-all duration-500 telem-idle">
+          <p class="text-[10px] uppercase tracking-widest text-slate-400 mb-4">Телеметрия</p>
+          <div class="space-y-3">
             <div class="flex justify-between items-center">
-              <span class="text-[11px]" style="color:#475569">Высота (Z)</span>
-              <span id="rt-height" class="text-xs font-bold" style="font-family:'JetBrains Mono',monospace;color:#e2e8f0">0.00 м</span>
+              <span class="text-xs text-slate-400">Высота (Z)</span>
+              <span id="rt-height" class="text-sm font-mono font-bold text-white">0.00 м</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-[11px]" style="color:#475569">Скорость</span>
-              <span id="rt-speed" class="text-xs font-bold" style="font-family:'JetBrains Mono',monospace;color:#e2e8f0">0.0 м/с</span>
+              <span class="text-xs text-slate-400">Скорость</span>
+              <span id="rt-speed" class="text-sm font-mono font-bold text-white">0.0 м/с</span>
             </div>
             <div class="flex justify-between items-center">
-              <span class="text-[11px]" style="color:#475569">Сила Магнуса</span>
-              <span id="rt-magnus" class="text-xs font-bold" style="font-family:'JetBrains Mono',monospace;color:#e2e8f0">0.00 м/с²</span>
+              <span class="text-xs text-slate-400">Сила Магнуса</span>
+              <span id="rt-magnus" class="text-sm font-mono font-bold text-white">0.00 м/с²</span>
             </div>
           </div>
         </div>
 
-        <div id="coachAnalysis" class="hidden rounded-2xl p-4 border transition-all duration-500" style="border-color:rgba(168,85,247,0.3);background:rgba(88,28,135,0.12)">
-          <p class="text-[9px] font-bold uppercase tracking-[0.2em] mb-2" style="color:rgba(192,132,252,0.8)">🔍 Физический разбор</p>
-          <p id="coachAnalysisText" class="text-[11px] leading-relaxed" style="color:#cbd5e1"></p>
+        <div id="coachAnalysis" class="hidden rounded-xl p-4 border border-[#a855f7]/30 bg-[#a855f7]/10 backdrop-blur-sm transition-all duration-500">
+          <p class="text-[10px] uppercase tracking-widest text-[#d8b4fe] mb-2">Физический разбор</p>
+          <p id="coachAnalysisText" class="text-xs leading-relaxed text-slate-300"></p>
         </div>
 
       </div>
@@ -359,7 +354,7 @@ function simulateServe(){
 
   let px = startX;
   let py = -1.45; 
-  let pz = 0.15 + P.impactHeight; 
+  let pz = P.impactHeight; 
   
   let vx = spd * Math.cos(va) * Math.sin(ha);
   let vy = spd * Math.cos(va) * Math.cos(ha);
@@ -372,8 +367,9 @@ function simulateServe(){
   const traj = [];
   const bounces = [];
   let t = 0;
+  let lastSaveT = 0;
   let outcome = 'hit', faultReason = '';
-  traj.push({x:px, y:py, z:pz, spd, mg:0, t:0, vx, vy, vz, sx, sy, sz});
+  traj.push({x:px, y:py, z:pz, spd, mg:0, t:0, vx, vy, vz, sx, sy, sz, bIdx: bounces.length});
 
   while(t < 2.2){
     const v = [vx,vy,vz];
@@ -405,57 +401,54 @@ function simulateServe(){
       const xNet = px+tf*(npx-px);
       if(zNet <= NET_H && Math.abs(xNet) <= TBL_HW){
         outcome='fault'; faultReason='Сетка!';
-        traj.push({x:xNet, y:0, z:zNet, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx,vy,vz,sx,sy,sz});
+        traj.push({x:xNet, y:0, z:zNet, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx,vy,vz,sx,sy,sz, bIdx: bounces.length});
         break;
       }
     }
 
-    // Table bounces with Magnus Spin transformation
+    // --- НАЧАЛО БЛОКА ОТСКОКА ---
     if(npz <= 0 && nvz < 0){
       const inTbl = Math.abs(npx)<=TBL_HW && Math.abs(npy)<=TBL_HL;
+      
+      traj.push({x:npx, y:npy, z:0, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx:nvx, vy:nvy, vz:-nvz*0.82, sx, sy, sz, bIdx: bounces.length});
       bounces.push({pos:{x:npx,y:npy,z:0}, t});
       
-      if(!inTbl){
-        outcome = 'fault';
-        faultReason = bounces.length === 1 ? 'Мяч мимо нашей половины!' : 'Аут за стол!';
-        traj.push({x:npx, y:npy, z:0, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx,vy,vz,sx,sy,sz});
-        break;
-      } else {
-        if(bounces.length === 1 && npy > 0){
-          outcome = 'fault'; faultReason = 'Без отскока у себя!';
-          break;
-        }
-        if(bounces.length >= 2){
-          if(npy < 0) { outcome = 'fault'; faultReason = 'Два отскока у себя!'; }
-          else { outcome = 'hit'; }
-          traj.push({x:npx, y:npy, z:0, spd:mag3([nvx,nvy,nvz]), mg:mgAcc, t, vx,vy,vz,sx,sy,sz});
-          break; 
-        }
-      }
-
-      // SPIN TO VELOCITY TRANSFORMATIONS (Friction kick)
-      vz = -nvz * 0.82;
-      vx = nvx + sz * BALL_R * 0.42;  // Sidespin table kick
-      vy = nvy - sx * BALL_R * 0.46;  // Topspin accelerates / Backspin reverses velocity!
+      if(!inTbl){ 
+        if(bounces.length <= 2) { outcome = 'fault'; faultReason = bounces.length === 1 ? 'Аут!' : 'Аут за стол!'; }
+        else { outcome = 'hit'; }
+        break; 
+      } 
       
-      sx*=0.65; sy*=0.65; sz*=0.65;
-      px=npx; py=npy; pz=0.005;
-      // CRITICAL FIX: record exact bounce contact point (Z=0) so trajectory line
-      // shows the true reflected parabola instead of cutting the corner.
-      traj.push({x:npx, y:npy, z:0, spd:mag3([vx,vy,vz]), mg:mgAcc, t, vx, vy, vz, sx, sy, sz});
+      if(bounces.length === 1 && npy > 0){ outcome = 'fault'; faultReason = 'Без отскока у себя!'; break; }
+      if(bounces.length === 2 && npy < 0){ outcome = 'fault'; faultReason = 'Два отскока у себя!'; break; }
+      if(bounces.length === 3){ outcome = 'hit'; break; }
+      
+      const spinFrictionX = sz * BALL_R * 0.015;
+      const spinFrictionY = -sx * BALL_R * 0.015;
+      const clampX = Math.max(-1.5, Math.min(1.5, spinFrictionX));
+      const clampY = Math.max(-1.5, Math.min(1.5, spinFrictionY));
+
+      vz = -nvz * 0.85; 
+      vx = nvx * 0.90 + clampX; 
+      vy = nvy * 0.90 + clampY;  
+      sx*=0.6; sy*=0.6; sz*=0.6;
+      
+      px=npx; py=npy; pz=0; // Строгая привязка к поверхности
       continue;
     }
+    // --- КОНЕЦ БЛОКА ОТСКОКА ---
 
-    if(Math.abs(px) > TBL_HW + 1.2 || npy > TBL_HL + 1.2) {
-       if(outcome==='hit') { outcome='fault'; faultReason='Аут!'; }
+    if(Math.abs(px) > TBL_HW || npy > TBL_HL) { 
+       if(bounces.length >= 2) { outcome='hit'; } else { outcome='fault'; faultReason='Аут!'; }
        break;
     }
 
     px=npx; py=npy; pz=Math.max(npz,0);
     vx=nvx; vy=nvy; vz=nvz;
 
-    if(traj.length % 4 === 0){
-      traj.push({x:px, y:py, z:pz, spd:mag3([vx,vy,vz]), mg:mgAcc, t, vx, vy, vz, sx, sy, sz});
+    if(t - lastSaveT >= 0.01){
+      traj.push({x:px, y:py, z:pz, spd:mag3([vx,vy,vz]), mg:mgAcc, t, vx, vy, vz, sx, sy, sz, bIdx: bounces.length});
+      lastSaveT = t;
     }
   }
 
@@ -649,7 +642,7 @@ function renderStill(){
 function draw3DScene(W, H, bSt){
   // ── Background gradient ──
   const bgGrd = ctx.createLinearGradient(0,0,0,H);
-  bgGrd.addColorStop(0,'#020c1b'); bgGrd.addColorStop(1,'#050f20');
+  bgGrd.addColorStop(0,'#0b0e14'); bgGrd.addColorStop(1,'#131722');
   ctx.fillStyle=bgGrd; ctx.fillRect(0,0,W,H);
 
   // ── Subtle floor grid ──
@@ -787,23 +780,26 @@ function draw3DScene(W, H, bSt){
 
   // ── HAWK-EYE TRAJECTORY CURVE ──
   if(G_res && G_res.traj.length > 1){
-    const isReplay = bSt.phase === 'replay';
-    // Outer glow pass
-    ctx.strokeStyle = isReplay ? 'rgba(168,85,247,0.2)' : 'rgba(56,189,248,0.18)';
-    ctx.lineWidth = 6; ctx.beginPath();
-    let firstGlow = true;
-    G_res.traj.forEach(pt=>{
-      const sp=proj([pt.x,pt.y,pt.z],W,H);
-      if(sp){ if(firstGlow){ctx.moveTo(sp.x,sp.y);firstGlow=false;}else ctx.lineTo(sp.x,sp.y); }
-    });
-    ctx.stroke();
-    // Inner sharp line
-    ctx.strokeStyle = isReplay ? 'rgba(192,132,252,0.65)' : 'rgba(56,189,248,0.65)';
-    ctx.lineWidth = 2; ctx.beginPath();
-    let firstLine = true;
-    G_res.traj.forEach(pt=>{
-      const sp=proj([pt.x,pt.y,pt.z],W,H);
-      if(sp){ if(firstLine){ctx.moveTo(sp.x,sp.y);firstLine=false;}else ctx.lineTo(sp.x,sp.y); }
+    ctx.lineWidth = 2.5;
+    let currentStroke = '';
+    ctx.beginPath();
+    let first = true;
+    G_res.traj.forEach((pt, i) => {
+      const p = proj([pt.x, pt.y, pt.z], W, H);
+      if(!p) return;
+      // Если индекс отскока 2 (т.е. летит после 2-го касания) - красим в желтый
+      const targetColor = pt.bIdx >= 2 ? '#fde047' : (bSt.phase === 'replay' ? '#a855f7' : '#3b82f6');
+      if(first) {
+         ctx.strokeStyle = targetColor; currentStroke = targetColor; ctx.moveTo(p.x, p.y); first = false;
+      } else {
+         if(targetColor !== currentStroke) {
+            ctx.stroke(); ctx.beginPath(); 
+            const prev = proj([G_res.traj[i-1].x, G_res.traj[i-1].y, G_res.traj[i-1].z], W, H);
+            if(prev) ctx.moveTo(prev.x, prev.y);
+            ctx.strokeStyle = targetColor; currentStroke = targetColor;
+         }
+         ctx.lineTo(p.x, p.y);
+      }
     });
     ctx.stroke();
   }
@@ -944,11 +940,14 @@ function draw3DScene(W, H, bSt){
     ctx.beginPath(); ctx.ellipse(sp.x-r*0.28,sp.y-r*0.3,r*0.22,r*0.15,-0.4,0,Math.PI*2); ctx.fill();
 
     // Force vectors (replay phase)
-    if(bSt.phase==='replay'&&bSt.vx!==undefined){
-      const vp=proj([bSt.x+bSt.vx*0.06,bSt.y+bSt.vy*0.06,bSt.z+bSt.vz*0.06],W,H);
+    if(bSt.phase==='replay' && bSt.vx!==undefined){
+      const vM = Math.hypot(bSt.vx, bSt.vy, bSt.vz) || 1;
+      const vp = proj([bSt.x + (bSt.vx/vM)*0.15, bSt.y + (bSt.vy/vM)*0.15, bSt.z + (bSt.vz/vM)*0.15], W, H);
       if(vp){ ctx.strokeStyle='#facc15'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(sp.x,sp.y); ctx.lineTo(vp.x,vp.y); ctx.stroke(); }
-      const omv=cross3([bSt.sx,bSt.sy,bSt.sz],[bSt.vx,bSt.vy,bSt.vz]);
-      const mp=proj([bSt.x+omv[0]*0.4,bSt.y+omv[1]*0.4,bSt.z+omv[2]*0.4],W,H);
+      
+      const omv = cross3([bSt.sx,bSt.sy,bSt.sz], [bSt.vx,bSt.vy,bSt.vz]);
+      const omvM = Math.hypot(omv[0], omv[1], omv[2]) || 1;
+      const mp = proj([bSt.x + (omv[0]/omvM)*0.15, bSt.y + (omv[1]/omvM)*0.15, bSt.z + (omv[2]/omvM)*0.15], W, H);
       if(mp){ ctx.strokeStyle='#22d3ee'; ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(sp.x,sp.y); ctx.lineTo(mp.x,mp.y); ctx.stroke(); }
     }
   }
